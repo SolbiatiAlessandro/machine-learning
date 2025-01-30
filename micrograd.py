@@ -16,6 +16,11 @@ class Value:
     return f"Value(data={self.data})"
 
 
+  def __gt__(self, other):
+     if isinstance(other, Value):
+       return self.data > other.data
+     return self.data > other  
+
   def __truediv__(self, other): # self / other
     return self * (other ** -1)
 
@@ -96,6 +101,15 @@ class Value:
     out._backward = _backward
     return out  
 
+  def relu(self):
+    out = Value(0 if self.data < 0 else self.data, (self,), 'ReLU')
+
+    def _backward():
+        self.grad += (out.data > 0) * out.grad
+    out._backward = _backward
+
+    return out
+
 
   def tanh(self):
     x = self.data
@@ -175,7 +189,7 @@ import random
 
 class Neuron:
   
-  def __init__(self, nin, activation='tanh'):
+  def __init__(self, nin, activation='relu'):
     self.w = [Value(random.uniform(-1,1)) for _ in range(nin)]
     self.b = Value(random.uniform(-1,1))
     self.activation = activation
@@ -183,8 +197,8 @@ class Neuron:
   def __call__(self, x):
     # w * x + b
     act = sum((wi*xi for wi, xi in zip(self.w, x)), self.b)
-    if self.activation == 'tanh':
-        out = act.tanh()
+    if self.activation == 'relu':
+        out = act.relu()
     elif self.activation == 'sigmoid':
         out = act.sigmoid()
     else:
@@ -197,7 +211,7 @@ class Neuron:
 class Layer:
   
   def __init__(self, nin, nout):
-    activation = 'tanh' if nout > 1 else 'sigmoid'
+    activation = 'relu' if nout > 1 else 'sigmoid'
     self.neurons = [Neuron(nin, activation=activation) for _ in range(nout)]
   
   def __call__(self, x):
