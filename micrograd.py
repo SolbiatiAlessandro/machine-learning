@@ -19,6 +19,17 @@ class Value:
   def __truediv__(self, other): # self / other
     return self * (other ** -1)
 
+  def log(self):
+    assert self.data > 0, "Logarithm is only defined for positive values"
+    out = Value(math.log(self.data), (self,), 'log')
+
+    def _backward():
+        # Derivative of log(x) is 1 / x
+        self.grad += (1 / self.data) * out.grad
+
+    out._backward = _backward
+    return out
+
   def __pow__(self, other):
     assert isinstance(other, (int, float)), "only supporting int/float powers for now"
     out = Value(self.data**other, (self,), f'**{other}')
