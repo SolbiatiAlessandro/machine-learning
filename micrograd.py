@@ -96,6 +96,17 @@ class Value:
     out._backward = _backward
 
     return out
+
+  def sigmoid(self):
+    x = self.data
+    s = 1 / (1 + math.exp(-x))
+    out = Value(s, (self, ), 'sigmoid')
+    
+    def _backward():
+      self.grad += s * (1 - s) * out.grad
+
+    out._backward = _backward
+    return out
        
   def backward(self): # exactly as in video  
     topo = []
@@ -153,14 +164,20 @@ import random
 
 class Neuron:
   
-  def __init__(self, nin):
+  def __init__(self, nin, activation='tanh'):
     self.w = [Value(random.uniform(-1,1)) for _ in range(nin)]
     self.b = Value(random.uniform(-1,1))
+    self.activation = activation
   
   def __call__(self, x):
     # w * x + b
     act = sum((wi*xi for wi, xi in zip(self.w, x)), self.b)
-    out = act.tanh()
+    if self.activation == 'tanh':
+        out = act.tanh()
+    elif self.activation == 'sigmoid':
+        out = act.sigmoid()
+    else:
+      raise NotImplementedError
     return out
   
   def parameters(self):
@@ -169,7 +186,8 @@ class Neuron:
 class Layer:
   
   def __init__(self, nin, nout):
-    self.neurons = [Neuron(nin) for _ in range(nout)]
+    activation = 'tanh' if nout > 1 else 'sigmoid'
+    self.neurons = [Neuron(nin, activation=activation) for _ in range(nout)]
   
   def __call__(self, x):
     outs = [n(x) for n in self.neurons]
