@@ -42,3 +42,4 @@ Python-only implemention of Neural Networks. Playing with my own implementation 
 - Ch9: Recommendation systems
 - https://applyingml.com/resources/discovery-system-design/ 
 - https://applied-llms.org/ 
+- Neel Nanda Transformers https://www.youtube.com/watch?v=bOYE6E8JrtU&list=PL7m7hLIqA0hoIUPhC26ASCVs_VrqcDpAz&index=1
