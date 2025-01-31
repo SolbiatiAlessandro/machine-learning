@@ -18,13 +18,13 @@ NN Zero to Hero from Karpathy. Implementation of GPT-2 from scratch in pytorch. 
 
 Python-only implemention of Neural Networks. Playing with my own implementation of micrograd from Karpathy. Some interesting results
 
-![](https://raw.githubusercontent.com/SolbiatiAlessandro/ML-system-design/refs/heads/main/micrograd-MLP.svg)
+![](https://raw.githubusercontent.com/SolbiatiAlessandro/ML-system-design/refs/heads/main/imgs/micrograd-MLP.svg)
 
 - make_moons_30_Jan_A.ipynb - a small MLP is able to optimize loss function, but it learns a linear function. Not able to make the model learn non linearity.
 - make_moons_30_Jan_B.ipynb - a small MLP with more techniques is able to learn non linear function from scikit learn moon. The circles function are half learned but not completely 
 
-![](https://github.com/SolbiatiAlessandro/ML-system-design/blob/main/micrograd-1.png)
-![](https://github.com/SolbiatiAlessandro/ML-system-design/blob/main/micrograd-2.png)
+![](https://github.com/SolbiatiAlessandro/ML-system-design/blob/main/imgs/micrograd-1.png)
+![](https://github.com/SolbiatiAlessandro/ML-system-design/blob/main/imgs/micrograd-2.png)
 
 
 ## Other Resources
