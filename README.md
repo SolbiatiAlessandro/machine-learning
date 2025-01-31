@@ -1,4 +1,4 @@
-# alex-micrograd
+# ML System Design
 
 Playing with my own implementation of micrograd from Karpathy. Some interesting results
 
