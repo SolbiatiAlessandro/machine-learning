@@ -4,7 +4,7 @@ Repo to prepare for ML System Design interview
 
 ## [In Progress] Recommender System challenge
 
-Using Kaggle dataset to implement an exercise e2e recommender system. [https://www.kaggle.com/competitions/otto-recommender-system/](https://www.kaggle.com/competitions/otto-recommender-system/)
+Using Kaggle dataset to implement an exercise e2e recommender system. [https://www.kaggle.com/competitions/otto-recommender-system/](https://www.kaggle.com/competitions/otto-recommender-system/) and [https://www.kaggle.com/competitions/h-and-m-personalized-fashion-recommendations](https://www.kaggle.com/competitions/h-and-m-personalized-fashion-recommendations)
 
 ## [In Progress] Search System challenge
 
