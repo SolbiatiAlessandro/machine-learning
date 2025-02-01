@@ -28,6 +28,8 @@ online metric - click, purchase click
 
 lables 
 
+class imbalance
+
 article_id, prod_name, prod_type,name, product_group, graphical appearance no/name, colour
 
 color -> user preferences user x color features
@@ -59,6 +61,7 @@ article features
 user x article features
 - did user already buy this article
 - age article preferences
+- cross id features (ID Matching)
 
 contextual features
 - day (weekend, weekday)
@@ -67,6 +70,8 @@ sparse features
 - user id
 - article id
 - articles bought by the users in last 7 days
+- dense bucketization for user features
+- dense bucketization for item features
 
 embedding features
 - article embedding from the picture, image understanding model 
@@ -74,6 +79,26 @@ embedding features
 - user x cluster_id purchased in the past information
 
 # Modelling
+
+two stage ranking 
+
+retrieval 
+
+TTSN
+- user tower
+- item tower
+- KNN on embeddings
+
+
+ranking
+
+GBDT ?
+factorizaion machines
+deep and wide
+SparseNN
+
+Factorization Machine to capture all the feature-feature interaction
+Deep NN to capture non linearities
 
 # Offline Evaluation
 
