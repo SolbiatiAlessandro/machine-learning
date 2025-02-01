@@ -2,7 +2,7 @@
 
 Repo to prepare for ML System Design interview
 
-## [In Progress] Recommender System challenge
+## [In Progress] Recommender System (Personalized Fashion Recommendations)
 
 Using Kaggle dataset to implement an exercise e2e recommender system. [https://www.kaggle.com/competitions/otto-recommender-system/](https://www.kaggle.com/competitions/otto-recommender-system/) and [https://www.kaggle.com/competitions/h-and-m-personalized-fashion-recommendations](https://www.kaggle.com/competitions/h-and-m-personalized-fashion-recommendations)
 
@@ -10,7 +10,7 @@ Using Kaggle dataset to implement an exercise e2e recommender system. [https://w
 
 I want to find a good search system design dataset to implement exercise e2e search system.
 
-## [In Progress] GPT-2
+## [In Progress] NanoGPT
 
 NN Zero to Hero from Karpathy. Implementation of GPT-2 from scratch in pytorch. [https://www.youtube.com/watch?v=kCc8FmEb1nY&list=PLAqhIrjkxbuWI23v9cThsA9GvCAUhRvKZ&index=7](https://www.youtube.com/watch?v=kCc8FmEb1nY&list=PLAqhIrjkxbuWI23v9cThsA9GvCAUhRvKZ&index=7)
 
