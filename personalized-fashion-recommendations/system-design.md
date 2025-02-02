@@ -30,6 +30,11 @@ lables
 
 class imbalance
 
+- **cold start, new user id won't have any data from before**
+- logging, data cleaned. 
+- **Online and offline coverage**
+- negative sampling, strategy. Random sampling, more sophisticated like popularity, Screen passed, X-s out.
+
 article_id, prod_name, prod_type,name, product_group, graphical appearance no/name, colour
 
 color -> user preferences user x color features
@@ -84,11 +89,14 @@ two stage ranking
 
 retrieval 
 
+injection of post popular articles in inventory
+
 TTSN
 - user tower
 - item tower
 - KNN on embeddings
-
+- different tower size based on  training data size
+- at the top either cross product with sigmoid, or concat and MLP
 
 ranking
 
@@ -99,6 +107,9 @@ SparseNN
 
 Factorization Machine to capture all the feature-feature interaction
 Deep NN to capture non linearities
+
+**model size**
+- think about how many parameters this model should be, how many GPUs we should use
 
 # Offline Evaluation
 
