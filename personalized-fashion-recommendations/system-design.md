@@ -92,11 +92,13 @@ retrieval
 injection of post popular articles in inventory
 
 TTSN
+- idea behind TTSN is that at inference time the complexity is O(users + articles) not O(users * articles) because I can use the two towers independtly and do KNN
 - user tower
 - item tower
 - KNN on embeddings
 - different tower size based on  training data size
 - at the top either cross product with sigmoid, or concat and MLP
+
 
 ranking
 
