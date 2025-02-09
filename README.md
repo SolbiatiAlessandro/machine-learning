@@ -2,9 +2,10 @@
 
 Repo to prepare for ML System Design interview. 
 
-- [Not Started] Recommender System (Personalized Fashion Recommendations)
-- [Not Started] Search System challenge
+- [Not Started] LLM RAG System Implementation
+- [In Progress] SpareNN Retrieval/Ranking Recommendation System Implementation
 - [In Progress] NanoGPT
+- [In Progress] Makemore
 - [Completed] Micrograd
 
 -----------
@@ -17,9 +18,14 @@ Using Fashion Recommender System dataset to build a muli-stage ranking recommend
 
 ![](https://raw.githubusercontent.com/SolbiatiAlessandro/ML-system-design/refs/heads/main/imgs/recommendersystem-recall1.png)
 
-## [Not Started] Search System challenge
+## [In Progress] Makemore
 
-I want to find a good search system design dataset to implement exercise e2e search system.
+NN Zero to Hero from Karpathy. Implementation of name-generation language models. Bi-grams, MLP, RNNs and other models in plain pytorch. Here are some interesting histogram from hyperparameter search on some simple language model
+
+![](https://raw.githubusercontent.com/SolbiatiAlessandro/ML-system-design/refs/heads/main/imgs/makemore-hist1.png)
+![](https://raw.githubusercontent.com/SolbiatiAlessandro/ML-system-design/refs/heads/main/imgs/makemore-hist2.png)
+
+
 
 ## [In Progress] NanoGPT
 
