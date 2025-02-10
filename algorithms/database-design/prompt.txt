@@ -1,0 +1,17 @@
+电面coding轮：
+之前地里多人分享过的Design in memory data base. 要求
+- Support Query
+- Query with Where condition
+- Query with Where condition on multiple columns
+- Query with Where and Order by one column
+- Query with Where and Order by multiple columns
+
+其中where condition只要求考虑And的情况。没完成一个步需要自己现场跑一个test case.
+这轮因为之前准备过，回答很顺利，后面还聊了5分钟。
+
+电面system design轮：
+要求设计一个类似slack的企业内部聊天软件。
+
+因为我5年前入职现在公司的时候没有准备过系统设计，这次为了显示对OpenAI(及其高薪)的尊重，请假一周专门准备面试，但是系统设计从零开始准备这些时间还是不够，而且也没押中这道题。遗憾自己没被面到排名前几的高频题，但是确实自己这方面能力也不足。那之后还在陆续学习系统设计，看了Alex Xu的第一本书，欢迎大家分享系统设计学习经验！
+
+第一次发面经，求加大米，感谢好心人！
