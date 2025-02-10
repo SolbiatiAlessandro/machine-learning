@@ -36,6 +36,8 @@ Different chunking strategies
 
 > https://github.com/project-miracl/miracl
 
+> https://arxiv.org/pdf/2112.09118
+
 example of informationl retrieval kaggle competition
 
 ------------
