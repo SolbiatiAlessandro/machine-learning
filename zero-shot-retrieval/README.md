@@ -1,3 +1,5 @@
+# Zero Shot Retrieval (VMWare Kaggle Competition)
+
 - kaggle competition https://www.kaggle.com/competitions/vmware-zero-shot-information-retrieval
 - text embedding notebook https://www.kaggle.com/code/alessandrosolbiati/zero-shot-learning-vmware-text-embedding/edit/run/221920319
 - corpus data analysis https://www.kaggle.com/code/alessandrosolbiati/vmware-eda

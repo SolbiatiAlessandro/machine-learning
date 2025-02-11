@@ -2,15 +2,22 @@
 
 Repo to prepare for ML System Design interview. 
 
-- [Not Started] LLM RAG System Implementation
-- [In Progress] SpareNN Retrieval/Ranking Recommendation System Implementation
+- [In Progress] Zero Shot LLM Retrieval
+- [In Progress] SparseNN Recommender System 
 - [In Progress] NanoGPT
 - [In Progress] Makemore
 - [Completed] Micrograd
 
 -----------
 
-## [In Progress] Recommender System (Personalized Fashion Recommendations)
+## [In Progress] Zero Shot LLM Retrieval
+
+Using VMWare docs corpus (30M documents) from Kaggle to implement a e2e retrieval system using LLM encoders and generative models. Picture below is the tensorboard of the 12 stacked transformer blocks from https://huggingface.co/intfloat/e5-small-v2 used for text embedding
+
+![](https://raw.githubusercontent.com/SolbiatiAlessandro/ML-system-design/refs/heads/main/imgs/zero-shot-retrieval.png)
+
+
+## [In Progress] SparseNN Recommender System 
 
 Using Fashion Recommender System dataset to build a muli-stage ranking recommender system for 10M users and 100k fashion articles [https://www.kaggle.com/competitions/h-and-m-personalized-fashion-recommendations](https://www.kaggle.com/competitions/h-and-m-personalized-fashion-recommendations)
 
