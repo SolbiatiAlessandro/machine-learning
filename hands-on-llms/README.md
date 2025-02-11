@@ -78,3 +78,13 @@ fully supported by citations (**citation recall**), and not
 every citation supports its associated statement (**citation
 precision**).
 - **LLM-as-a-judge**:  https://docs.ragas.io/en/stable/concepts/metrics/available_metrics/ capable LLM acting as a judge to score the generation on different axis like faithfulness (answer consistent to provided context) and relevance
+
+
+# Chapter 10 Embedding models
+
+- embedding models purpose is to create a **accurate representation** of the text, accurate in the domain you care about.
+- **contrastive learning**: similar documents are closer in vector space, different documents are far away
+- **cross-encoder vs bi-encoder architecture**
+- the emebddings of LLMs can not be compared semantically
+- **contrastive loss** we apply cosine similarity to pairs of embeddings, and we use that as logits. We give logits to softmwax to get probabiltiees, and we use cross-entropy loss on those proabiblities. 
+- self supervised finetuning of embedding models: word masking, auto-encoders, contrastive loss between pairs
