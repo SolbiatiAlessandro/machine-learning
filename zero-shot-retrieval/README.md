@@ -40,6 +40,11 @@ mostly documents and blogs, each one has some extraction in metadata
 200k docs lengths between 1k and 5k characters
 queries
 
+embedding process
+- start with some sampled data
+- we should do per document type embedding but for now
+- let's keep that as hyperparameters
+
 ### Queries
 lot to think about queries
 queries matter a lot
@@ -72,3 +77,29 @@ for each paragraph do a cross encoder for re ranking
 can the cross encoder be a LLM ?
 
 
+## Notes Feb 10
+
+Able to get embeddings using BERT-like model https://huggingface.co/intfloat/e5-small-v2
+
+T2 GPU inference time + memory
+- 300MiB to load the model weights
+- 1315MiB /  15360MiB after first inference of 300
+- 2709MiB /  15360MiB inference of 600
+- 13913MiB /  15360MiB  inference for 3000 chunks, takes 3 seconds (3 * 10^3 seconds)
+- total number of chunks is 3*10^7 = 10^4 seconds to embed them all = 3 hours
+- I have two GPUs and I can do it in parallel and is going to take 1 hour
+
+CPU memory storage
+- 3000 embeddings are 3000 * 348 emb size * 4bytes = 1MB in memory  = 10^6
+- I have 10GB memory 10^10 , can hold 3 * 10^3 * 10^4 = 3 10^7 embeddings
+
+Next steps need to setup a end to end evaluation loop to iterate before starting the e2e embedding
+
+steps missing
+- indexing of the embedding
+- query rewriting from LLM
+- get top X , use LLM to judge relevance score, compute nDCG@5
+
+questions
+- how to sample for the e2e loop? could search for a specific keywords the docs are talking about to make sure that all queries and all documents are about the same topic
+- optional would be to use a cross-encoder model to re-rank top X
