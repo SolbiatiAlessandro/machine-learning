@@ -30,6 +30,7 @@ cost(b) = min index i bi != i
 1 1, 10k , 2, 2,
 10k 
 
+
 - X1 X2 X3.. - Y1 Y2.. - Z1.. - 0
 b = index(last)
 b - k = space
@@ -118,6 +119,10 @@ x x
 5 4
 1 1 10k 2 2
 
+5 4
+[1 1] [2] [2] [3 3]
+
+1 2 x
 
 """
 
