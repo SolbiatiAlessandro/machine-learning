@@ -36,7 +36,7 @@ hyperparams = {
     'embedding_dim': 10,
     'hidden_layer': 10*10*5,
     'batch_size': 128,
-    'epochs': 8000
+    'epochs': 6000
 }
 
 # read it in to inspect it
@@ -108,15 +108,15 @@ for p in model.parameters():
     #print(len(p))
     
 print("\n\n-- Generation Before Training --")
-"".join(int_to_characters[x.item()] for x in model.generate(
+print("".join(int_to_characters[x.item()] for x in model.generate(
     torch.zeros((1, 1), dtype=torch.long, device=device), 
     100
-)[0])
+)[0]))
 
 print("\n\n-- Training --")
 optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 
-epochs = 10000
+epochs = hyperparams['epochs']
 lossi, vlossi = [], []
 
 #xval, yval = get_batch('val', batch_size=len(val_data))
@@ -139,11 +139,11 @@ for epoch in range(epochs):
         with torch.no_grad():
             _, vloss = model(xval, yval)
             vlossi.append(vloss.item())
-            print(f"{epoch}: training loss = {loss.item():.2f}, validation loss = {vloss.item():.2f}")
+            print(f"{epoch}: training loss = {loss.item():.4f}, validation loss = {vloss.item():.4f}")
 
 
 print("\n\n-- Generation After Training --")
-"".join(int_to_characters[x.item()] for x in model.generate(
+print("".join(int_to_characters[x.item()] for x in model.generate(
     torch.zeros((1, 1), dtype=torch.long, device=device), 
     100
-)[0])
+)[0]))
