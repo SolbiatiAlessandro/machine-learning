@@ -3,14 +3,14 @@ from sys import stdin
 
 
 def solve(a, n, m):
-   # 1 1 1 10k 2, 5, 3
+    # 1 1 2 2 3 3 4 4
     if n == m:
-        full = True
-        for i in range(int(n / 2)):
-            if (i + 1) != a[i*2]:
-                full = False
-        if full:
-            return int(n/2) + 1
+        for i in range(n): # 1
+            if i % 2 == 1: 
+                b_index = (i // 2) + 1 # 1
+                if b_index != a[i]: # 1
+                    return b_index
+        return b_index + 1
     
     gap = n - m # 1
     for k in range(gap + 1): 
