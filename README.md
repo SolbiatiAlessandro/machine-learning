@@ -2,14 +2,37 @@
 
 Repo to prepare for ML System Design interview. 
 
-- [*Completed*] Micrograd - replicating [karpathy/micrograd](https://github.com/karpathy/micrograd)
+- [*In Progress*] MiniGPT - replicating [karpathy/minGPT](https://github.com/karpathy/minGPT)
 - [*Completed*] Makemore - replicating [karpathy/makemore](https://github.com/karpathy/makemore)
+- [*Completed*] Micrograd - replicating [karpathy/micrograd](https://github.com/karpathy/micrograd)
 - [*Completed*] Zero Shot LLM Retrieval - submissions to [Kaggle VMWare Zero-shot Retrieval competition](https://www.kaggle.com/competitions/vmware-zero-shot-information-retrieval)
 - [*Completed*] SparseNN Recommender System - submissions to [Kaggle H&M Recommmender System competition](https://www.kaggle.com/competitions/h-and-m-personalized-fashion-recommendations)
-- [*In Progress*] MinGPT - replicating [karpathy/minGPT](https://github.com/karpathy/minGPT)
+
 
 
 -----------
+
+
+## [In Progress] MiniGPT
+
+Implementation of "Attention is All You Need" trasfomer architecture with minimal pytorch APIs, similar to [karpathy/minGPT](https://github.com/karpathy/minGPT). This is the next word prediction cross-entropy loss achieved on the Shakespeare dataset with different baselines.
+
+![](https://raw.githubusercontent.com/SolbiatiAlessandro/ML-system-design/refs/heads/main/imgs/minGPT-losses.png)
+
+Example generation of Shakespeare like text with Transformer@3k parameters. 
+![](https://raw.githubusercontent.com/SolbiatiAlessandro/ML-system-design/refs/heads/main/imgs/minigpt-shakespeare1.png)
+
+
+## [*Completed*] Makemore
+
+Replicated the makemore repo from Karpathy from his Zero to Hero NN course. Implementation of name-generation language models. Bi-grams, MLP, RNNs and other models in plain pytorch. This is the performance I was able to reproduce independently on the several architectures covered in the course.
+
+![](https://raw.githubusercontent.com/SolbiatiAlessandro/ML-system-design/refs/heads/main/imgs/makemore-performance.png)
+
+Here are some interesting histogram from hyperparameter search on some simple language model
+
+![](https://raw.githubusercontent.com/SolbiatiAlessandro/ML-system-design/refs/heads/main/imgs/makemore-hist1.png)
+![](https://raw.githubusercontent.com/SolbiatiAlessandro/ML-system-design/refs/heads/main/imgs/makemore-hist2.png)
 
 ## [*Completed*] Micrograd
 
@@ -23,17 +46,6 @@ Python-only implemention of Neural Networks. Playing with my own implementation 
 ![](https://github.com/SolbiatiAlessandro/ML-system-design/blob/main/imgs/micrograd-1.png)
 ![](https://github.com/SolbiatiAlessandro/ML-system-design/blob/main/imgs/micrograd-2.png)
 
-
-## [*Completed*] Makemore
-
-Replicated the makemore repo from Karpathy from his Zero to Hero NN course. Implementation of name-generation language models. Bi-grams, MLP, RNNs and other models in plain pytorch. This is the performance I was able to reproduce independently on the several architectures covered in the course.
-
-![](https://raw.githubusercontent.com/SolbiatiAlessandro/ML-system-design/refs/heads/main/imgs/makemore-performance.png)
-
-Here are some interesting histogram from hyperparameter search on some simple language model
-
-![](https://raw.githubusercontent.com/SolbiatiAlessandro/ML-system-design/refs/heads/main/imgs/makemore-hist1.png)
-![](https://raw.githubusercontent.com/SolbiatiAlessandro/ML-system-design/refs/heads/main/imgs/makemore-hist2.png)
 
 ## [*Completed*] Zero Shot LLM Retrieval
 
@@ -52,15 +64,6 @@ Using Fashion Recommender System dataset to build a muli-stage ranking recommend
 
 
 
-## [In Progress] MinGPT
-
-NN Zero to Hero from Karpathy. Implementation of GPT-2 from scratch in pytorch. [https://www.youtube.com/watch?v=kCc8FmEb1nY&list=PLAqhIrjkxbuWI23v9cThsA9GvCAUhRvKZ&index=7](https://www.youtube.com/watch?v=kCc8FmEb1nY&list=PLAqhIrjkxbuWI23v9cThsA9GvCAUhRvKZ&index=7)
-
-- [nanogpt-mlp.ipynb](https://github.com/SolbiatiAlessandro/ML-system-design/blob/main/nanogpt/nanogpt-mlp.ipynb) - interesting experience where a simple MLP is able to get 50% accuracy on tiny-shakespeare dataset and spit out almost coherent sentences (the prompt is highlighted in light blue in images below)
-
-![](https://raw.githubusercontent.com/SolbiatiAlessandro/ML-system-design/refs/heads/main/imgs/nanogpt-mlp1.png)
-![](https://raw.githubusercontent.com/SolbiatiAlessandro/ML-system-design/refs/heads/main/imgs/nanogpt-mlp2.png)
-![](https://raw.githubusercontent.com/SolbiatiAlessandro/ML-system-design/refs/heads/main/imgs/nanogpt-mlp3.png)
 
 
 ## Other Resources
