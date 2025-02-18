@@ -1,38 +1,15 @@
-# ML System Design
+# ML-System-Design
 
-Repo to prepare for ML System Design interview. 
+Preparing for ML System Design interviews
 
-- /mingpt -> **[*In Progress*] MiniGPT**, replicating [karpathy/minGPT](https://github.com/karpathy/minGPT)
-- /makemore -> **[*Completed*] Makemore**, replicating [karpathy/makemore](https://github.com/karpathy/makemore)
-- /micrograd -> **[*Completed*]  Micrograd**, replicating [karpathy/micrograd](https://github.com/karpathy/micrograd)
-- /zero-shot-retrieval -> **[*Completed*] Zero Shot LLM Retrieval**, submissions to [Kaggle VMWare Zero-shot Retrieval competition](https://www.kaggle.com/competitions/vmware-zero-shot-information-retrieval)
-- /personalized-fashion-recommendations -> **[*Completed*]  SparseNN Recommender System**, submissions to [Kaggle H&M Recommmender System competition](https://www.kaggle.com/competitions/h-and-m-personalized-fashion-recommendations)
-- /algorithms -> **[*In Progress*]** Codeforces contests and Leetcode Hard Design questions 
-
-algorithms
-[algorithm] codeforces contest
-2 hours ago
-hands-on-llms
-[hands-on-llm] notes
-last week
-imgs
-Add files via upload
-11 minutes ago
-makemore
-[makemore] finished course achieveing 1.99 loss with Wavenet
-2 days ago
-micrograd
-[housekeeping]
-3 weeks ago
-mingpt
-[miniGPT] transformer with 11k parameteres achieves 1.7 loss on Shake…
-14 minutes ago
-personalized-fashion-recommendations
-Create README.md
-2 weeks ago
-zero-shot-retrieval
-Kaggle Notebook | Zero Shot Learning (VMWare) Text Embedding | Version 9
-last week
+| Folder                                      | Project                                      | Status       |
+|---------------------------------------------|----------------------------------------------|-------------|
+| /mingpt                                     | **MiniGPT**, replicating [karpathy/minGPT](https://github.com/karpathy/minGPT) | 🟠 **In Progress** |
+| /makemore                                   | **Makemore**, replicating [karpathy/makemore](https://github.com/karpathy/makemore) |  ✅ **Completed** |
+| /micrograd                                  | **Micrograd**, replicating [karpathy/micrograd](https://github.com/karpathy/micrograd) |  ✅ **Completed** |
+| /zero-shot-retrieval                        | **Zero Shot LLM Retrieval**, submissions to [Kaggle VMWare Zero-shot Retrieval competition](https://www.kaggle.com/competitions/vmware-zero-shot-information-retrieval) |  ✅ **Completed** |
+| /personalized-fashion-recommendations       | **SparseNN Recommender System**, submissions to [Kaggle H&M Recommender System competition](https://www.kaggle.com/competitions/h-and-m-personalized-fashion-recommendations) |  ✅ **Completed** |
+| /algorithms                                 | Codeforces contests and Leetcode Hard Design questions | 🟠 **In Progress** |
 
 
 -----------
