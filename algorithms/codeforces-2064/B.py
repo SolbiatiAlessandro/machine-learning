@@ -1,5 +1,5 @@
 # run on python 3.7.2
-from sys import stdin
+import sys
 
 # 2 2 1 3 2
 # 3 4
@@ -26,22 +26,23 @@ from sys import stdin
 # 3 5
 
 
-
 def main():
-    t = int(stdin.readline())
-    for i in range(t):
-        n = int(stdin.readline())
-        a = list(map(int, stdin.readline().split()))
-        print(solve(n, a))
+    input_data = sys.stdin.buffer.read().split()
+    t = int(input_data[0])
+    index = 1
+    results = []
+    for _ in range(t):
+        n = int(input_data[index])
+        index += 1
+        a = list(map(int, input_data[index:index+n]))
+        index += n
+        results.append(solve(n, a))
+    sys.stdout.write("\n".join(results))
 
+from collections import Counter
 def solve(n, a):
 
-    fcount = {}
-    for x in a:
-        if x not in fcount.keys():
-            fcount[x] = 1
-        else:
-            fcount[x] += 1
+    fcount = Counter(a)
 
     max_len = 0
     max_l, max_r = -1, -1
@@ -67,7 +68,7 @@ def solve(n, a):
         ix += 1
 
     if max_l == -1:
-        return 0
+        return "0"
     return f"{max_l} {max_r}"
 
 
