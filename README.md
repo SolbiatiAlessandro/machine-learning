@@ -4,7 +4,8 @@ Preparing for ML System Design interviews
 
 | Folder                                      | Project                                      | Status       |
 |---------------------------------------------|----------------------------------------------|-------------|
-| /mingpt                                     | **MiniGPT**, replicating [karpathy/minGPT](https://github.com/karpathy/minGPT) | 🟠 **In Progress** |
+| /GPT-2                                      | **GPT-2**, replicating [karpathy/nanoGPT](https://github.com/karpathy/nanoGPT) | 🟠 **In Progress** | 
+| /mingpt                                     | **MiniGPT**, replicating [karpathy/minGPT](https://github.com/karpathy/minGPT) | ✅ **In Progress** |
 | /makemore                                   | **Makemore**, replicating [karpathy/makemore](https://github.com/karpathy/makemore) |  ✅ **Completed** |
 | /micrograd                                  | **Micrograd**, replicating [karpathy/micrograd](https://github.com/karpathy/micrograd) |  ✅ **Completed** |
 | /zero-shot-retrieval                        | **Zero Shot LLM Retrieval**, submissions to [Kaggle VMWare Zero-shot Retrieval competition](https://www.kaggle.com/competitions/vmware-zero-shot-information-retrieval) |  ✅ **Completed** |
@@ -15,13 +16,13 @@ Preparing for ML System Design interviews
 -----------
 
 
-## [In Progress] MiniGPT
+## [Completed] MiniGPT
 
 Implementation of "Attention is All You Need" trasfomer architecture with minimal pytorch APIs, similar to [karpathy/minGPT](https://github.com/karpathy/minGPT). This is the next word prediction cross-entropy loss achieved on the Shakespeare dataset with different baselines.
 
 ![](https://raw.githubusercontent.com/SolbiatiAlessandro/ML-system-design/refs/heads/main/imgs/minGPT-losses.png)
 
-Example generation of Shakespeare like text with Transformer@3k parameters. 
+*the number of parameters is wrong, should be in the range of millions. Re-running the best model with Karpathy hyperparams achieved a validation loss of 1.66. This is an example generation of Shakespeare like text with Transformer@3k parameters. 
 ![](https://raw.githubusercontent.com/SolbiatiAlessandro/ML-system-design/refs/heads/main/imgs/minigpt-shakespeare1.png)
 
 
