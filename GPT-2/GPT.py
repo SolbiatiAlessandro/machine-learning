@@ -4,6 +4,7 @@ import torch
 import torch.nn.functional as F
 import math
 
+
 @dataclass
 class GPTConfig:
     block_size: int = 1024
@@ -12,11 +13,8 @@ class GPTConfig:
     batch_size: int = 1
     n_layer: int = 12
     n_head: int = 12
+
     
-config = GPTConfig
-
-
-
 class MultiHeadedMaskedSelfAttention(nn.Module):
     """
     transformer.h.0.attn.c_attn.weight torch.Size([768, 2304])
@@ -27,43 +25,47 @@ class MultiHeadedMaskedSelfAttention(nn.Module):
     def __init__(self, config):
         super().__init__()
         
+        self.config = config
         self.c_attn = nn.Linear(config.n_embd, config.n_embd * 3)
         self.c_proj = nn.Linear(config.n_embd, config.n_embd)
         
         
     def forward(self, x):
+        config = self.config
+        B, T, C = x.size()
         qkv = self.c_attn(x)
         q,k,v = qkv.split(split_size=config.n_embd, dim=2)
         q = q.view(
-            config.batch_size, 
-            config.block_size, 
+            B, 
+            T, 
             config.n_head,
             config.n_embd // config.n_head
         ).transpose(1,2)
         k = k.view(
-            config.batch_size, 
-            config.block_size, 
+            B, 
+            T, 
             config.n_head,
             config.n_embd // config.n_head
         ).transpose(1,2)
         
         attention = (q @ k.transpose(2,3)) * (1.0 / math.sqrt(k.size(-1)))
         
+        # this could be slow cause we are creating mask every time
         masked_attention = F.softmax(
             attention.masked_fill(
-                ~torch.tril(torch.ones_like(attention, dtype=torch.bool)), 
+                ~torch.tril(torch.ones_like(attention, dtype=torch.bool, device=attention.device)), 
                 float('-inf')),
             dim=-1)
         
         v = v.view(
-            config.batch_size, 
-            config.block_size, 
+            B, 
+            T, 
             config.n_head,
             config.n_embd // config.n_head
         ).transpose(1,2)
         
         out = masked_attention @ v
-        out = out.transpose(1,2).contiguous().view(config.batch_size,config.block_size,config.n_embd)
+        out = out.transpose(1,2).contiguous().view(B,T,config.n_embd)
         out = self.c_proj(out)
         return out
         
@@ -104,7 +106,7 @@ class TransformerBlock(nn.Module):
         return x
 
 class GPT(nn.Module):
-    def __init__(self, config):
+    def __init__(self, config, device='cuda'):
         super().__init__()
         self.config = config
         self.transformer = nn.ModuleDict(dict(
@@ -114,10 +116,12 @@ class GPT(nn.Module):
              ln_f = nn.LayerNorm(config.n_embd)
         ))
         self.lm_head = nn.Linear(config.n_embd, config.vocab_size, bias=False)
-        self.position_input = torch.tensor(range(config.block_size))
+        self.position_input = torch.tensor(range(config.block_size), device=device)
         
     def forward(self, x):
-        x = self.transformer.wte(x) + self.transformer.wpe(self.position_input)
+        B, T = x.size()
+        assert T <= self.config.block_size, f"(alex) Sequence too long! (length={T})"
+        x = self.transformer.wte(x) + self.transformer.wpe(torch.arange(0, T, dtype=torch.long, device=x.device))
         for block in self.transformer.h:
             x = block(x)
         x = self.transformer.ln_f(x)
@@ -129,7 +133,7 @@ class GPT(nn.Module):
         """Loads pretrained GPT-2 model weights from huggingface"""
         assert model_type in {'gpt2', 'gpt2-medium', 'gpt2-large', 'gpt2-xl'}
         from transformers import GPT2LMHeadModel
-        print("loading weights from pretrained gpt: %s" % model_type)
+        print("[GPT.from_pretrained] loading weights from pretrained gpt: %s" % model_type)
 
         # n_layer, n_head and n_embd are determined from model_type
         config_args = {
@@ -138,7 +142,7 @@ class GPT(nn.Module):
             'gpt2-large':   dict(n_layer=36, n_head=20, n_embd=1280), # 774M params
             'gpt2-xl':      dict(n_layer=48, n_head=25, n_embd=1600), # 1558M params
         }[model_type]
-        print(config_args)
+        # print(config_args)
         config_args['vocab_size'] = 50257 # always 50257 for GPT model checkpoints
         config_args['block_size'] = 1024 # always 1024 for GPT model checkpoints
         # create a from-scratch initialized minGPT model
@@ -177,10 +181,3 @@ class GPT(nn.Module):
                     sd[k].copy_(sd_hf[k])
 
         return model
-
-    
-gpt = GPT.from_pretrained('gpt2')
-print("loaded model", gpt)
-x = torch.randint(0, config.vocab_size, (config.batch_size, config.block_size))
-x = gpt(x)
-print("predicted", x.shape, x)
