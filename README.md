@@ -4,10 +4,11 @@ Preparing for ML System Design interviews
 
 | Folder                                      | Project                                      | Status       |
 |---------------------------------------------|----------------------------------------------|-------------|
-| /GPT-2                                      | **GPT-2**, replicating [karpathy/nanoGPT](https://github.com/karpathy/nanoGPT) | 🟠 **In Progress** | 
-| /mingpt                                     | **MiniGPT**, replicating [karpathy/minGPT](https://github.com/karpathy/minGPT) | ✅ **In Progress** |
-| /makemore                                   | **Makemore**, replicating [karpathy/makemore](https://github.com/karpathy/makemore) |  ✅ **Completed** |
-| /micrograd                                  | **Micrograd**, replicating [karpathy/micrograd](https://github.com/karpathy/micrograd) |  ✅ **Completed** |
+| /GPT-2                                      | **GPT-2**, replicating GPT2 from scratch following [karpathy/nanoGPT](https://github.com/karpathy/nanoGPT) | 🟠 **In Progress** | 
+| /llm-tokenizer                                      | **Tokenizers**, LLMs tokenizers following [karpathy/minbpe](https://github.com/karpathy/minbpe) | 🟠 **In Progress** | 
+| /mingpt                                     | **MiniGPT**, implementing transformers from 'Attention is All You Need' following [karpathy/minGPT](https://github.com/karpathy/minGPT) | ✅ **In Progress** |
+| /makemore                                   | **Makemore**, simple language models following  [karpathy/makemore](https://github.com/karpathy/makemore) |  ✅ **Completed** |
+| /micrograd                                  | **Micrograd**, implementation of backpropagation following [karpathy/micrograd](https://github.com/karpathy/micrograd) |  ✅ **Completed** |
 | /zero-shot-retrieval                        | **Zero Shot LLM Retrieval**, submissions to [Kaggle VMWare Zero-shot Retrieval competition](https://www.kaggle.com/competitions/vmware-zero-shot-information-retrieval) |  ✅ **Completed** |
 | /personalized-fashion-recommendations       | **SparseNN Recommender System**, submissions to [Kaggle H&M Recommender System competition](https://www.kaggle.com/competitions/h-and-m-personalized-fashion-recommendations) |  ✅ **Completed** |
 | /algorithms                                 | Codeforces contests and Leetcode Hard Design questions | 🟠 **In Progress** |
