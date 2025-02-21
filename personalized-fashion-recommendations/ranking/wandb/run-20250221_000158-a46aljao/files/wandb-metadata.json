@@ -1,0 +1,87 @@
+{
+    "os": "Linux-5.19.0-45-generic-x86_64-with-glibc2.35",
+    "python": "3.11.7",
+    "heartbeatAt": "2025-02-21T00:01:58.916313",
+    "startedAt": "2025-02-21T00:01:58.475975",
+    "docker": null,
+    "cuda": null,
+    "args": [],
+    "state": "running",
+    "program": "ML-system-design/personalized-fashion-recommendations/ranking/sparsenn.ipynb",
+    "codePathLocal": null,
+    "root": "/notebooks/ML-system-design",
+    "git": {
+        "remote": "https://github.com/SolbiatiAlessandro/ML-system-design",
+        "commit": "5446f933bb391d627d7af43e5e80a142c69288a8"
+    },
+    "email": null,
+    "host": "nkfvtn75yq",
+    "username": "root",
+    "executable": "/usr/local/bin/python3",
+    "cpu_count": 8,
+    "cpu_count_logical": 8,
+    "cpu_freq": {
+        "current": 3201.199,
+        "min": 0.0,
+        "max": 0.0
+    },
+    "cpu_freq_per_core": [
+        {
+            "current": 3201.199,
+            "min": 0.0,
+            "max": 0.0
+        },
+        {
+            "current": 3201.199,
+            "min": 0.0,
+            "max": 0.0
+        },
+        {
+            "current": 3201.199,
+            "min": 0.0,
+            "max": 0.0
+        },
+        {
+            "current": 3201.199,
+            "min": 0.0,
+            "max": 0.0
+        },
+        {
+            "current": 3201.199,
+            "min": 0.0,
+            "max": 0.0
+        },
+        {
+            "current": 3201.199,
+            "min": 0.0,
+            "max": 0.0
+        },
+        {
+            "current": 3201.199,
+            "min": 0.0,
+            "max": 0.0
+        },
+        {
+            "current": 3201.199,
+            "min": 0.0,
+            "max": 0.0
+        }
+    ],
+    "disk": {
+        "/": {
+            "total": 244.23077011108398,
+            "used": 96.49221801757812
+        }
+    },
+    "gpu": "NVIDIA RTX A4000",
+    "gpu_count": 1,
+    "gpu_devices": [
+        {
+            "name": "NVIDIA RTX A4000",
+            "memory_total": 17171480576
+        }
+    ],
+    "memory": {
+        "total": 44.08214569091797
+    }
+}

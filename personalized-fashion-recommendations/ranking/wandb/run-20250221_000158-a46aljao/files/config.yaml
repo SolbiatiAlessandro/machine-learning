@@ -1,0 +1,51 @@
+wandb_version: 1
+
+batch_size:
+  desc: null
+  value: 64
+embedding_size:
+  desc: null
+  value: 50
+epochs:
+  desc: null
+  value: 10000
+test_epochs:
+  desc: null
+  value: 1000
+test_loss_interval:
+  desc: null
+  value: 200
+_wandb:
+  desc: null
+  value:
+    python_version: 3.11.7
+    cli_version: 0.15.10
+    framework: huggingface
+    huggingface_version: 4.35.2
+    is_jupyter_run: true
+    is_kaggle_kernel: false
+    start_time: 1740096118.486893
+    t:
+      1:
+      - 1
+      - 5
+      - 11
+      - 49
+      - 53
+      - 55
+      2:
+      - 1
+      - 5
+      - 11
+      - 49
+      - 53
+      - 55
+      3:
+      - 16
+      - 23
+      4: 3.11.7
+      5: 0.15.10
+      6: 4.35.2
+      8:
+      - 1
+      - 5

@@ -1,0 +1,25 @@
+Error in callback <bound method _WandbInit._pause_backend of <wandb.sdk.wandb_init._WandbInit object at 0x7f3734617c90>> (for post_run_cell), with arguments args (<ExecutionResult object at 7f3734617d50, execution_count=260 error_before_exec=None error_in_exec=None info=<ExecutionInfo object at 7f382b313c90, raw_cell="import wandb
+wandb.init(project="personsalized-fas.." store_history=True silent=False shell_futures=True cell_id=26bbce80-822d-43a7-a2c6-40194ec8d5f3> result=<wandb.sdk.wandb_run.Run object at 0x7f3734618f10>>,),kwargs {}:
+Error in callback <bound method _WandbInit._resume_backend of <wandb.sdk.wandb_init._WandbInit object at 0x7f3734617c90>> (for pre_run_cell), with arguments args (<ExecutionInfo object at 7f373406eb50, raw_cell="from dataclasses import dataclass
+@dataclass
+clas.." store_history=True silent=False shell_futures=True cell_id=1cb65cad-9cf8-4d8a-9ee3-bf7ae0060d9a>,),kwargs {}:
+Error in callback <bound method _WandbInit._pause_backend of <wandb.sdk.wandb_init._WandbInit object at 0x7f3734617c90>> (for post_run_cell), with arguments args (<ExecutionResult object at 7f37341a9e10, execution_count=261 error_before_exec=None error_in_exec=None info=<ExecutionInfo object at 7f373406eb50, raw_cell="from dataclasses import dataclass
+@dataclass
+clas.." store_history=True silent=False shell_futures=True cell_id=1cb65cad-9cf8-4d8a-9ee3-bf7ae0060d9a> result=None>,),kwargs {}:
+Error in callback <bound method _WandbInit._resume_backend of <wandb.sdk.wandb_init._WandbInit object at 0x7f3734617c90>> (for pre_run_cell), with arguments args (<ExecutionInfo object at 7f3734087490, raw_cell="from dataclasses import dataclass
+@dataclass
+clas.." store_history=True silent=False shell_futures=True cell_id=1cb65cad-9cf8-4d8a-9ee3-bf7ae0060d9a>,),kwargs {}:
+Error in callback <bound method _WandbInit._pause_backend of <wandb.sdk.wandb_init._WandbInit object at 0x7f3734617c90>> (for post_run_cell), with arguments args (<ExecutionResult object at 7f37341cd8d0, execution_count=262 error_before_exec=None error_in_exec=None info=<ExecutionInfo object at 7f3734087490, raw_cell="from dataclasses import dataclass
+@dataclass
+clas.." store_history=True silent=False shell_futures=True cell_id=1cb65cad-9cf8-4d8a-9ee3-bf7ae0060d9a> result=None>,),kwargs {}:
+Error in callback <bound method _WandbInit._resume_backend of <wandb.sdk.wandb_init._WandbInit object at 0x7f3734617c90>> (for pre_run_cell), with arguments args (<ExecutionInfo object at 7f367dbb2210, raw_cell="from dataclasses import dataclass
+@dataclass
+clas.." store_history=True silent=False shell_futures=True cell_id=1cb65cad-9cf8-4d8a-9ee3-bf7ae0060d9a>,),kwargs {}:
+Error in callback <bound method _WandbInit._pause_backend of <wandb.sdk.wandb_init._WandbInit object at 0x7f3734617c90>> (for post_run_cell), with arguments args (<ExecutionResult object at 7f382b307a50, execution_count=263 error_before_exec=None error_in_exec=None info=<ExecutionInfo object at 7f367dbb2210, raw_cell="from dataclasses import dataclass
+@dataclass
+clas.." store_history=True silent=False shell_futures=True cell_id=1cb65cad-9cf8-4d8a-9ee3-bf7ae0060d9a> result=None>,),kwargs {}:
+Error in callback <bound method _WandbInit._resume_backend of <wandb.sdk.wandb_init._WandbInit object at 0x7f3734617c90>> (for pre_run_cell), with arguments args (<ExecutionInfo object at 7f37341bc3d0, raw_cell="h" store_history=True silent=False shell_futures=True cell_id=7bb60dfb-4f90-4dd6-b5bd-4ee073d701da>,),kwargs {}:
+Error in callback <bound method _WandbInit._pause_backend of <wandb.sdk.wandb_init._WandbInit object at 0x7f3734617c90>> (for post_run_cell), with arguments args (<ExecutionResult object at 7f37342e95d0, execution_count=264 error_before_exec=None error_in_exec=None info=<ExecutionInfo object at 7f37341bc3d0, raw_cell="h" store_history=True silent=False shell_futures=True cell_id=7bb60dfb-4f90-4dd6-b5bd-4ee073d701da> result=H(architecture='embeddings', batch_size=64, embedding_size=50, epochs=10000, test_epochs=1000, test_loss_interval=200)>,),kwargs {}:
+Error in callback <bound method _WandbInit._resume_backend of <wandb.sdk.wandb_init._WandbInit object at 0x7f3734617c90>> (for pre_run_cell), with arguments args (<ExecutionInfo object at 7f37342e96d0, raw_cell="print(h)" store_history=True silent=False shell_futures=True cell_id=7bb60dfb-4f90-4dd6-b5bd-4ee073d701da>,),kwargs {}:
+H(architecture='embeddings', batch_size=64, embedding_size=50, epochs=10000, test_epochs=1000, test_loss_interval=200)
+Error in callback <bound method _WandbInit._pause_backend of <wandb.sdk.wandb_init._WandbInit object at 0x7f3734617c90>> (for post_run_cell), with arguments args (<ExecutionResult object at 7f3734054e50, execution_count=265 error_before_exec=None error_in_exec=None info=<ExecutionInfo object at 7f37342e96d0, raw_cell="print(h)" store_history=True silent=False shell_futures=True cell_id=7bb60dfb-4f90-4dd6-b5bd-4ee073d701da> result=None>,),kwargs {}:
