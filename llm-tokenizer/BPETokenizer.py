@@ -19,7 +19,8 @@ class TokenPair:
 
 class Tokenizer:
     """a simple Byte Pair Enconding (BPE) Tokenizer from Karpathy tokenizers class"""
-    def __init__(self, tokens, encoding_vocab_size=276):
+    def __init__(self, tokens, encoding_vocab_size=276, raw_tokens=True):
+        if not raw_tokens: tokens = tokens.encode('utf-8')
         self.encoding_vocab_size = encoding_vocab_size
         self._original_tokens, self.encoded_tokens = tokens, tokens 
         self.mint_token = 256
@@ -60,17 +61,42 @@ class Tokenizer:
         self.encoding_map[top_tp._key()] = self.mint_token
         
         self.mint_token += 1
+        if debug and self.mint_token % 10 == 0 : print(f"[Tokenizer.swap_top] {self.mint_token}")
         self.count(self.encoded_tokens)
         if debug: print(self.encoded_tokens)
         return max(self.encoded_tokens) + 1 == self.encoding_vocab_size
             
     def train(self, debug=False):
         """returns the encoded training set"""
-        finshed_encoding = self.swap_top()
+        finshed_encoding = self.swap_top(debug=debug)
         while not finshed_encoding:
-            finshed_encoding = self.swap_top()
+            finshed_encoding = self.swap_top(debug=debug)
         if debug: print(self.encoded_tokens)
         return self.encoded_tokens
+    
+    def save_to_file(self):     
+        import pickle
+
+        # An arbitrary collection of objects supported by pickle.
+        data = {
+            'encoding_map': self.encoding_map,
+            'decoding_map': self.decoding_map,
+        }
+
+        with open('tokenizer.pickle', 'wb') as f:
+            # Pickle the 'data' dictionary using the highest protocol available.
+            pickle.dump(data, f, pickle.HIGHEST_PROTOCOL)
+            
+    def load_from_file(self):
+        import pickle
+
+        with open('tokenizer.pickle', 'rb') as f:
+            # The protocol version used is detected automatically, so we do not
+            # have to specify it.
+            data = pickle.load(f)
+            self.encoding_map = data['encoding_map']
+            self.decoding_map = data['decoding_map']
+        
     
     def decode(self, encoded_tokens, debug=False, raw_tokens=True):
         decoded = False
