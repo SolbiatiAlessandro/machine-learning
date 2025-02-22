@@ -24,7 +24,7 @@ class BERTConfig:
     hidden_layer_size = 1024
     attention_heads = 8
     attention_size = embedding_size // attention_heads
-    train_epochs = 10000
+    train_epochs = 1000000
     val_epochs = 30
     val_interval = 100
     transformer_blocks = 10
@@ -38,7 +38,7 @@ model.to(device)
 
 MLMloss = LossLogs("MLM", scale=0.1)
 NSPloss = LossLogs("NSP")
-data_loader = BERTDataLoader(config)
+data_loader = BERTDataLoader(config, name="wikitext2")
 print(f"[pretraining.py] BERT ready for pretraining with {sum(p.numel() for p in model.parameters()):,} parameters")
 
 print(f"[pretraining.py] Available GPU memory: {get_free_gpu_memory()[0]:,} MB")

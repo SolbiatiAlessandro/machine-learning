@@ -88,8 +88,8 @@ class DataLoader:
     
 class BERTDataLoader(DataLoader):
     """data loader for BERT-like MLM + NSP loss"""
-    def __init__(self, config):
-        super().__init__(config)
+    def __init__(self, config, name="tinyshakespeare"):
+        super().__init__(config, name=name)
         self.max_vocab_size = max(self.tokenizer.encoding_map.values())
         self.CLS =self.max_vocab_size + 1
         self.SEP = self.CLS + 1
