@@ -12,19 +12,20 @@ from sys import stdin
 # Q: are there only two sets? yes
  
  
-def main():
-    t = int(stdin.readline())
-    for i in range(t):
-        n, m = map(int, stdin.readline().split())
-        a = [[-1 for _ in range(m + 2)]]
-        for _ in range(n):
-            row = [-1]
-            row += list(map(int, stdin.readline().split())) 
-            row.append(-1)
-            a.append(row)
-        a.append([-1 for _ in range(m + 2)])
-        print(solve(a, n, m))
- 
+set1 = [0] * 50000
+set2 = [0] * 50000
+
+t = int(stdin.readline())
+for i in range(t):
+    n, m = map(int, stdin.readline().split())
+    a = [[-1 for _ in range(m + 2)]]
+    for _ in range(n):
+        row = [-1]
+        row += list(map(int, stdin.readline().split())) 
+        row.append(-1)
+        a.append(row)
+    a.append([-1 for _ in range(m + 2)])
+    print(solve(a, n, m))
  
  
 def has_neighbour(a, i, j):
@@ -46,8 +47,9 @@ def has_neighbour(a, i, j):
 from collections import defaultdict
 def solve(a, n, m, debug=True):
     #print(a)
-    set1 = [0] * 50000
-    set2 = [0] * 50000
+    set1 = list(map(lambda x: 0 for x in set1))
+    set2 = list(map(lambda x: 0 for x in set2))
+   
     lenset1 = 0
     lenset2 = 0
  

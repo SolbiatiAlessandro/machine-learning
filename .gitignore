@@ -1,5 +1,6 @@
 virtualenv
 /*data
+/*BERT_checkpoints*
 *data
 input.txt
 *input.txt
