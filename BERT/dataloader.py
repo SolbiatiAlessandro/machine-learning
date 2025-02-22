@@ -19,16 +19,22 @@ import BPETokenizer  # Now you should be able to import it
 
 class DataLoader:
     """next token prediction DataLoader used for GPT like models"""
-    def __init__(self, config, data_filename="tinyshakespeare.txt"):
+    def __init__(self, config, name="tinyshakespeare"):
+        """
+        name = tinyshakespeare
+        input text = tinyshakespeare.txt
+        tokenizer = tokenizer_tinyshakespeare.pickle
+        """
         
         self.config = config
-
+        data_filename = f"{name}.txt"
         with open(data_filename, 'r') as f:
             text = f.read()
         print(f"[DataLoader] {data_filename} size = {len(text)}")
 
-        self.tokenizer = BPETokenizer.Tokenizer(text, encoding_vocab_size=2000, raw_tokens=False)
+        self.tokenizer = BPETokenizer.Tokenizer(text, encoding_vocab_size=2000, raw_tokens=False, name=name)
         self.tokenizer.load_from_file()
+        print(f"[DataLoader] loaded tokenizer {self.tokenizer._filename()}")
         encoded_dataset = self.tokenizer.encode(text, raw_tokens=False)
         print(f"[DataLoader] max vocabulary size={max(encoded_dataset)}, compression ratio={len(encoded_dataset) / len(text)}")
         split = int(len(encoded_dataset) * 0.80)
