@@ -18,11 +18,19 @@ class InputRepresentation(nn.Module):
                              torch.arange(config.input_size))
     
     def forward(self, x):
-        token_embeddings = self.token_embeddings(x)
-        segment_embeddings = self.segment_embeddings(self.segment_index)
-        position_embeddings = self.position_embeddings(self.position_index)
+        if self.training:
+            token_embeddings = self.token_embeddings(x)
+            segment_embeddings = self.segment_embeddings(self.segment_index)
+            position_embeddings = self.position_embeddings(self.position_index)
+        else:
+            # predicting one sentence only
+            token_embeddings = self.token_embeddings(x)
+            segment_embeddings = self.segment_embeddings(torch.tensor([0] * x.shape[1], device=x.device))
+            position_embeddings = self.position_embeddings(torch.arange(x.shape[1]).to(x.device))
         x = position_embeddings + token_embeddings + segment_embeddings
         return x
+            
+            
     
     
     
@@ -90,6 +98,9 @@ class BERT(nn.Module):
         x = self.input_representation(x)
         for transformer in self.transformer_blocks:
             x = transformer(x)
+            
+        if not self.training:
+            return x
         
         pred_NSP = F.sigmoid(self.NSP_output(x[:, 0, :]))
         logits_MSM = self.MLM_output(x)

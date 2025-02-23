@@ -101,10 +101,13 @@ def save_checkpoint(model, optimizer, train_epoch, MLMloss, NSPloss, model_name)
 def load_checkpoint(model, optimizer, checkpoint_path, MLMloss, NSPloss):
     checkpoint = torch.load(checkpoint_path)
     model.load_state_dict(checkpoint['model_state_dict'])
-    optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+    if optimizer:
+        optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
     train_epoch = checkpoint['train_epoch']
-    MLMloss.load_state_dict(checkpoint['MLMloss_state'])
-    NSPloss.load_state_dict(checkpoint['NSPloss_state'])
+    if MLMloss:
+        MLMloss.load_state_dict(checkpoint['MLMloss_state'])
+    if NSPloss:
+        NSPloss.load_state_dict(checkpoint['NSPloss_state'])
     model_name = checkpoint['model_name']
     print(f"Checkpoint loaded from {checkpoint_path}, resuming at epoch {train_epoch}")
     return train_epoch, model_name

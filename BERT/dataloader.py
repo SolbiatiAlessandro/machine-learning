@@ -9,7 +9,7 @@ from random import random
 import math
 
 # Assuming your notebook's working directory is set such that ../llm-tokenizer is reachable:
-tokenizer_dir = os.path.abspath(os.path.join(os.getcwd(), '../llm-tokenizer'))
+tokenizer_dir = os.path.abspath(os.path.join(os.getcwd(), '../llm_tokenizer'))
 if tokenizer_dir not in sys.path:
     sys.path.insert(0, tokenizer_dir)
 
