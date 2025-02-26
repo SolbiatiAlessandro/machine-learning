@@ -1,4 +1,5 @@
 virtualenv
+*wandb*
 /*data
 /*BERT_checkpoints*
 *data
