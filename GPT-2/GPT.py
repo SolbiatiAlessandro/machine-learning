@@ -28,6 +28,7 @@ class MultiHeadedMaskedSelfAttention(nn.Module):
         self.config = config
         self.c_attn = nn.Linear(config.n_embd, config.n_embd * 3)
         self.c_proj = nn.Linear(config.n_embd, config.n_embd)
+        self.c_proj.RESIDUAL_LAYER = 1
         
         
     def forward(self, x):
@@ -80,6 +81,7 @@ class MLP(nn.Module):
         super().__init__()
         self.c_fc = nn.Linear(config.n_embd, config.n_embd * 4)
         self.c_proj = nn.Linear(config.n_embd * 4, config.n_embd)
+        self.c_proj.RESIDUAL_LAYER = 1
         self.activation = nn.GELU(approximate='tanh')
         
     def forward(self, x):
@@ -118,6 +120,27 @@ class GPT(nn.Module):
         self.lm_head = nn.Linear(config.n_embd, config.vocab_size, bias=False)
         self.position_input = torch.tensor(range(config.block_size), device=device)
         
+        self.transformer.wte.weight = self.lm_head.weight
+        
+        self.apply(self._init_weights)
+        
+        for i, layer in enumerate(self.transformer.h):
+            layer.apply(lambda l: self._scale_weights(l, i + 1))
+    
+    def _scale_weights(self, module, depth):
+        if getattr(module, "RESIDUAL_LAYER", 0):
+            #print("Scaling ", module, depth)
+            with torch.no_grad():
+                module.weight *= 1 / math.sqrt(depth)
+        
+    def _init_weights(self, module):
+        if isinstance(module, nn.Embedding):
+            torch.nn.init.normal_(module.weight, mean=0.0, std=0.02)
+        if isinstance(module, nn.Linear):
+            torch.nn.init.normal_(module.weight, mean=0.0, std=0.02)
+            if module.bias is not None:
+                torch.nn.init.zeros_(module.bias)
+        
     def forward(self, x):
         B, T = x.size()
         assert T <= self.config.block_size, f"(alex) Sequence too long! (length={T})"
@@ -126,6 +149,7 @@ class GPT(nn.Module):
             x = block(x)
         x = self.transformer.ln_f(x)
         x = self.lm_head(x)
+        #x = x @ self.transformer.wte.weight.T
         return x
     
     @classmethod

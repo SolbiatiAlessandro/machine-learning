@@ -1,6 +1,7 @@
 import torch
 import subprocess
 from dataclasses import dataclass
+from collections import defaultdict
 
 from dataclasses import dataclass, field
 import uuid
@@ -54,13 +55,18 @@ class LossLogs:
         self.name = name
         self.scale = scale
         self.wandb = wandb
+        self.infra = defaultdict(list)
     
-    def log_train(self, ix, loss):
+    def log_train(self, ix, loss, infra_metrics=None):
         if self.wandb: 
             # print("[LossLogs.log_train] logging wandb")
             self.wandb.log({f"{self.name}_train_loss": loss})
         self.train_x.append(ix)
         self.train_loss.append(loss)
+        if infra_metrics:
+            self.wandb.log(infra_metrics)
+            for k, v in infra_metrics.items():
+                self.infra[k].append(v)
         
     def log_val(self, train_ix, val_ix, loss):
         if train_ix in self.val_loss_bags.keys():

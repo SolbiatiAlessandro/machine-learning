@@ -3,8 +3,8 @@ from dataloader import DataLoader
 from utils import device, get_free_gpu_memory, LossLogs, save_checkpoint, load_checkpoint
 
 config = GPTConfig()
-config.batch_size = 32
-config.block_size = 64
+config.batch_size = 16
+config.block_size = 1024
 config.epochs = 10000
 config.validation_frequency = 20
 config.validation_epochs = 1
@@ -53,7 +53,11 @@ data_loader = DataLoader(config)
 
 model = GPT(config)
 model.to(device)
-print(sum(p.numel() for p in model.parameters()))
+model = torch.compile(model)
+total_params = sum(p.numel() for p in model.parameters())
+print(f"Total parameters: {total_params:,}")
+
+torch.set_float32_matmul_precision("high")
 
 optimizer = torch.optim.AdamW(model.parameters(), lr=0.00005)
 # train_losses, val_losses = [], []
@@ -62,22 +66,40 @@ bb = config.batch_size * config.block_size
 NTPloss = LossLogs("NTP", wandb=wandb)
 
 
+from time import time
 
 for train_epoch in range(config.epochs):
+    t0 = time()
     optimizer.zero_grad()
     X, y = data_loader.next_batch(device=device)
-    logits = model(X)
-    train_loss = F.cross_entropy(logits.view(bb, -1), y.view(bb))
+    t01 = time()
+    with torch.autocast(device_type=device, dtype=torch.bfloat16):
+        logits = model(X)
+        train_loss = F.cross_entropy(logits.view(bb, -1), y.view(bb))
     train_loss.backward()
     optimizer.step()
     
     #print(train_loss)
-    NTPloss.log_train(train_epoch, train_loss.item())
     
     
-    del X, y, logits
-    gc.collect()
-    torch.cuda.empty_cache()
+    
+    #del X, y, logits
+    #gc.collect()
+    #torch.cuda.empty_cache()
+    
+    torch.cuda.synchronize()
+    t1 = time()
+    dt = (t1 - t0) * 1000 
+    dt0 = (t01 - t0) * 1000
+    tps = 1000*X.shape[0]*X.shape[1]/dt
+    
+    
+    infra_metrics = {
+        'infra/iteration_time(ms)': dt,
+        'infra/data_loader_time(ms)': dt0,
+        'infra/tokens_per_second': tps
+    }
+    NTPloss.log_train(train_epoch, train_loss.item(), infra_metrics=infra_metrics if train_epoch > 5 else None)
     
     if train_epoch % config.validation_frequency == 0:
         model.eval()
@@ -95,9 +117,6 @@ for train_epoch in range(config.epochs):
                 
             
             model.train()
-    
-        
-            print(f"train={train_loss.item():.3f},val={NTPloss.get_val_loss(train_epoch):.3f}")
-
-# train=1.163,val=5.416
-# [880/10000] train_loss=3.59, val_loss=4.00
+            loss_string = f"[{train_epoch}/{config.epochs}] train_loss={train_loss.item():.3f},val_loss={NTPloss.get_val_loss(train_epoch):.3f}, "
+            infra_string = ", ".join([f"{k}={v:.3f}" for k,v in infra_metrics.items()])
+            print(loss_string + infra_string)
