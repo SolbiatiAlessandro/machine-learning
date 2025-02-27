@@ -3,11 +3,13 @@ from dataloader import DataLoader
 from utils import device, get_free_gpu_memory, LossLogs, save_checkpoint, load_checkpoint
 
 config = GPTConfig()
-config.batch_size = 16
+config.batch_size = 20
 config.block_size = 1024
-config.epochs = 10000
-config.validation_frequency = 20
-config.validation_epochs = 1
+config.epochs = 1000000
+config.validation_frequency = 50
+config.validation_epochs = 2
+config.dataset = "wikitext"
+config.tokenizer_name = "wikitext2"
 
 import wandb
 import random
@@ -53,6 +55,7 @@ data_loader = DataLoader(config)
 
 model = GPT(config)
 model.to(device)
+
 model = torch.compile(model)
 total_params = sum(p.numel() for p in model.parameters())
 print(f"Total parameters: {total_params:,}")

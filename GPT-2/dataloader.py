@@ -11,27 +11,41 @@ import BPETokenizer  # Now you should be able to import it
 
 class DataLoader:
     def __init__(self, config):
+        """
+        name = tinyshakespeare
+        input text = tinyshakespeare.txt
+        tokenizer = tokenizer_tinyshakespeare.pickle
+        """
         
         self.config = config
-
-        with open('input.txt', 'r') as f:
-            text = f.read()
-        len(text)
-
+        dataset_name = config.dataset
+        self.DATASET_FOLDER = "./datasets"
+       
+        self.tokenizer = BPETokenizer.Tokenizer("", encoding_vocab_size=2000, raw_tokens=False, name=config.tokenizer_name)
+        self.tokenizer.load_from_file()
+        print(f"[DataLoader.__init__] loaded tokenizer {self.tokenizer._filename()}")
         
-        tokenizer = BPETokenizer.Tokenizer(text, encoding_vocab_size=2000, raw_tokens=False)
-        tokenizer.load_from_file()
-        encoded_dataset = tokenizer.encode(text, raw_tokens=False)
-        print(f"max vocabulary size={max(encoded_dataset)}, compression ratio={len(encoded_dataset) / len(text)}")
-        split = int(len(encoded_dataset) * 0.80)
-        self.train_data =  torch.tensor(encoded_dataset[:split])
-        self.val_data = torch.tensor(encoded_dataset[split+config.block_size:])
-        print(f"train_data.shape={self.train_data.shape}, val_data.shape={self.val_data.shape}")
+        self.train_data =  self._load_dataset(f"{dataset_name}_train.txt")
+        self.val_data = self._load_dataset(f"{dataset_name}_val.txt")
+        print(f"[DataLoader.__init__] train_data.shape={self.train_data.shape}, val_data.shape={self.val_data.shape}")
         
         self.train_data_ix = 0
         self.val_data_ix = 0
         self.batch_step = self.config.batch_size * self.config.block_size 
         
+    def _load_dataset(self, filename):
+        if self.tokenizer is None: 
+            raise Exception("[DataloaderException] Need to load dataset after loading tokenizer")
+        filename = f"{self.DATASET_FOLDER}/{filename}"
+        with open(filename, 'r') as f:
+            text = f.read()
+        print(f"[DataLoader._load_dataset] {filename}: size = {len(text)}")
+        
+        encoded_dataset = self.tokenizer.encode(text, raw_tokens=False)
+        print(f"[DataLoader._load_dataset] {filename}: max vocabulary size={max(encoded_dataset)}, compression ratio={len(encoded_dataset) / len(text)}")
+        
+        return torch.tensor(encoded_dataset, device='cpu')
+
     def next_batch(self, mode="train", device='cpu'):
         """ mode=["train", "eval"] """
         if mode == "train":

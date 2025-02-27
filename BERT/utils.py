@@ -40,14 +40,25 @@ else:
 
 
 class LossLogs:
-    def __init__(self, name, scale=1):
+    """
+    usage
+    
+    MLMloss.log_train(train_epoch, loss_MLM.item())
+    MLMloss.log_val(train_epoch, val_epoch, loss_MLM.item()) 
+    
+    """
+    def __init__(self, name, wandb=None, scale=1):
         self.train_x, self.val_x = [], []
         self.train_loss, self.val_loss = [], []
         self.val_loss_bags = {}
         self.name = name
         self.scale = scale
+        self.wandb = wandb
     
     def log_train(self, ix, loss):
+        if self.wandb: 
+            print("[LossLogs.log_train] logging wandb")
+            wandb.log({f"{self.name}_train_loss": loss})
         self.train_x.append(ix)
         self.train_loss.append(loss)
         
@@ -61,6 +72,7 @@ class LossLogs:
         self.val_x.append(train_ix)
         val_loss = sum(self.val_loss_bags[train_ix]) / len(self.val_loss_bags[train_ix])
         self.val_loss.append(val_loss)
+        if self.wandb: wandb.log({f"{self.name}_val_loss": val_loss})
         return val_loss
     
     def train_loss_series(self, aggr=100):
