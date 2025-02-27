@@ -4,7 +4,8 @@ Preparing for ML System Design interviews
 
 | Folder                                      | Project                                      | Status       |
 |---------------------------------------------|----------------------------------------------|-------------|
-| /GPT-2                                      | **GPT-2**, replicating GPT2 from scratch following [karpathy/nanoGPT](https://github.com/karpathy/nanoGPT) | 🟠 **In Progress** | 
+| /GPT-2                                      | **GPT-2**, replicating GPT2 from scratch following [karpathy/nanoGPT](https://github.com/karpathy/nanoGPT) but with my own tokenizer | 🟠 **In Progress** | 
+| /BERT                                  | **BERT**, replicating BERT paper (without additional guidance) using my own tokenizer | ✅ **Completed** | 
 | /llm-tokenizer                                      | **Tokenizers**, LLMs tokenizers following [karpathy/minbpe](https://github.com/karpathy/minbpe) | 🟠 **In Progress** | 
 | /mingpt                                     | **MiniGPT**, implementing transformers from 'Attention is All You Need' following [karpathy/minGPT](https://github.com/karpathy/minGPT) | ✅ **Completed** |
 | /makemore                                   | **Makemore**, simple language models following  [karpathy/makemore](https://github.com/karpathy/makemore) |  ✅ **Completed** |
@@ -16,8 +17,22 @@ Preparing for ML System Design interviews
 
 -----------
 
+## ML-engineer/GPT-2
 
-## [Completed] MiniGPT
+Replicating GPT2 from scratch following [karpathy/nanoGPT](https://github.com/karpathy/nanoGPT) but with my own tokenizer. This is an example of improving token/s throughput for given model size by optimizing pytorch operations. Read more on my [GPT2 training notes](https://docs.google.com/document/d/12R4rATOytr2OkNysWoisq6W2CX2fWkpWQcm3G8LRyE4/edit?tab=t.0)
+
+![](https://raw.githubusercontent.com/SolbiatiAlessandro/ML-system-design/refs/heads/main/imgs/gpt2-throughtput1.png)
+
+
+
+
+## ML-engineer/BERT
+
+Implemention of BERT paper without additional guidance using my own tokenizer. This is an example of pretraining on Next Sentence Prediction (NSP) and Masked Language Modelling (MLM) tasks.
+
+![](https://raw.githubusercontent.com/SolbiatiAlessandro/ML-system-design/refs/heads/main/imgs/bert-losses2.png)
+
+## ML-engineer/MiniGPT
 
 Implementation of "Attention is All You Need" trasfomer architecture with minimal pytorch APIs, similar to [karpathy/minGPT](https://github.com/karpathy/minGPT). This is the next word prediction cross-entropy loss achieved on the Shakespeare dataset with different baselines.
 
@@ -27,7 +42,7 @@ Implementation of "Attention is All You Need" trasfomer architecture with minima
 ![](https://raw.githubusercontent.com/SolbiatiAlessandro/ML-system-design/refs/heads/main/imgs/minigpt-shakespeare1.png)
 
 
-## [*Completed*] Makemore
+## ML-engineer/Makemore
 
 Replicated the makemore repo from Karpathy from his Zero to Hero NN course. Implementation of name-generation language models. Bi-grams, MLP, RNNs and other models in plain pytorch. This is the performance I was able to reproduce independently on the several architectures covered in the course.
 
@@ -38,7 +53,7 @@ Here are some interesting histogram from hyperparameter search on some simple la
 ![](https://raw.githubusercontent.com/SolbiatiAlessandro/ML-system-design/refs/heads/main/imgs/makemore-hist1.png)
 ![](https://raw.githubusercontent.com/SolbiatiAlessandro/ML-system-design/refs/heads/main/imgs/makemore-hist2.png)
 
-## [*Completed*] Micrograd
+## ML-engineer/Micrograd
 
 Python-only implemention of Neural Networks. Playing with my own implementation of [micrograd](https://github.com/karpathy/micrograd) from Karpathy. Some interesting results
 
@@ -51,14 +66,14 @@ Python-only implemention of Neural Networks. Playing with my own implementation 
 ![](https://github.com/SolbiatiAlessandro/ML-system-design/blob/main/imgs/micrograd-2.png)
 
 
-## [*Completed*] Zero Shot LLM Retrieval
+## ML-engineer/Zero Shot LLM Retrieval
 
 Using VMWare docs corpus (30M documents) from Kaggle to implement a e2e retrieval system using LLM encoders and generative models. Picture below is the tensorboard of the 12 stacked transformer blocks from https://huggingface.co/intfloat/e5-small-v2 used for text embedding
 
 ![](https://raw.githubusercontent.com/SolbiatiAlessandro/ML-system-design/refs/heads/main/imgs/zero-shot-retrieval.png)
 
 
-## [*Completed*] SparseNN Recommender System 
+## ML-engineer/SparseNN Recommender System 
 
 Using Fashion Recommender System dataset to build a muli-stage ranking recommender system for 10M users and 100k fashion articles [https://www.kaggle.com/competitions/h-and-m-personalized-fashion-recommendations](https://www.kaggle.com/competitions/h-and-m-personalized-fashion-recommendations)
 
