@@ -47,7 +47,7 @@ class DataLoader:
             with open(filepath, 'r') as f:
                 text = f.read()
             print(f"[DataLoader._load_dataset] {filepath}: size = {len(text)}")
-            encoded_dataset = self.tokenizer.encode(text, raw_tokens=False)
+            encoded_dataset = self.tokenizer.encode(text)
             print(f"[DataLoader._load_dataset] {filepath}: max vocabulary size = {max(encoded_dataset)}, compression ratio = {len(encoded_dataset) / len(text)}")
             # Save the computed encoding to cache
             torch.save(encoded_dataset, cache_file)
