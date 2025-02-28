@@ -7,7 +7,7 @@ tokenizer_dir = os.path.abspath(os.path.join(os.getcwd(), '../llm_tokenizer'))
 if tokenizer_dir not in sys.path:
     sys.path.insert(0, tokenizer_dir)
 
-import BPETokenizer  # Now you should be able to import it
+from RegexTokenizer import FastTokenizer
 
 class DataLoader:
     def __init__(self, config):
@@ -21,7 +21,7 @@ class DataLoader:
         dataset_name = config.dataset
         self.DATASET_FOLDER = "./datasets"
        
-        self.tokenizer = BPETokenizer.Tokenizer("", encoding_vocab_size=2000, raw_tokens=False, name=config.tokenizer_name)
+        self.tokenizer = FastTokenizer("", name=config.tokenizer_name)
         self.tokenizer.load_from_file()
         print(f"[DataLoader.__init__] loaded tokenizer {self.tokenizer._filename()}")
         

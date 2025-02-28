@@ -9,8 +9,7 @@ config.epochs = 1000000
 config.validation_frequency = 50
 config.validation_epochs = 2
 config.dataset = "wikitext"
-config.tokenizer_name = "wikitext2"
-config.vocab_size = 660
+config.tokenizer_name = "wikitext2_18k"
 
 import wandb
 import random
@@ -107,7 +106,7 @@ for train_epoch in range(config.epochs):
     NTPloss.log_train(train_epoch, train_loss.item(), infra_metrics=infra_metrics if train_epoch > 5 else None)
     
     # Save checkpoints at epochs 2000, 10000, and 80000
-    if train_epoch in [1, 2000, 10000, 80000]:
+    if train_epoch in [1000, 5000, 80000]:
         save_checkpoint(model, optimizer, train_epoch, NTPloss, "GPT")
     
     if train_epoch % config.validation_frequency == 0:
