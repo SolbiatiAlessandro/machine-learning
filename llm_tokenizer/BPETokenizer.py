@@ -70,10 +70,11 @@ class Tokenizer:
             
     def train(self, debug=False):
         """returns the encoded training set"""
-        finshed_encoding = self.swap_top(debug=debug)
+        finshed_encoding = self.swap_top(debug=False)
         while not finshed_encoding:
-            finshed_encoding = self.swap_top(debug=debug)
-        if debug: print(self.encoded_tokens)
+            finshed_encoding = self.swap_top(debug=False)
+            if self.mint_token % 100 == 0 and debug: print(f"[BPETokenizer.train] mint_token={self.mint_token}")
+        #if debug: print(self.encoded_tokens)
         return self.encoded_tokens
     
     def _filename(self):
@@ -149,4 +150,24 @@ class Tokenizer:
             
         if debug: print(encoded_tokens)
         return encoded_tokens
+    
+    def visualize_encoding_map(self):
+        """Visualizes the merges in the encoding map as 'ab' 'cd' -> 'abcd'."""
+        print("Encoding Map Visualization:")
+        for minted_token, token_pair in sorted(self.decoding_map.items()):
+            def decode_token(token):
+                if token < 256:
+                    return chr(token) if 32 <= token < 127 else f"[{token}]"
+                elif token in self.decoding_map:
+                    first = decode_token(self.decoding_map[token].first_token)
+                    second = decode_token(self.decoding_map[token].second_token)
+                    return first + second
+                else:
+                    return f"[{token}]"
+
+            first = decode_token(token_pair.first_token)
+            second = decode_token(token_pair.second_token)
+            merged = first + second
+            print(f"'{first}' '{second}' -> '{merged}' (Token {minted_token})")
+
           
