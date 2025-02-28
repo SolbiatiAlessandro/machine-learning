@@ -3,13 +3,14 @@ from dataloader import DataLoader
 from utils import device, get_free_gpu_memory, LossLogs, save_checkpoint, load_checkpoint
 
 config = GPTConfig()
-config.batch_size = 20
+config.batch_size = 28
 config.block_size = 1024
 config.epochs = 1000000
 config.validation_frequency = 50
 config.validation_epochs = 2
 config.dataset = "wikitext"
 config.tokenizer_name = "wikitext2"
+config.vocab_size = 660
 
 import wandb
 import random
@@ -52,6 +53,7 @@ else:
     print("CUDA is not available, running on CPU.")
 
 data_loader = DataLoader(config)
+config.vocab_size = data_loader.vocab_size
 
 model = GPT(config)
 model.to(device)
@@ -103,6 +105,10 @@ for train_epoch in range(config.epochs):
         'infra/tokens_per_second': tps
     }
     NTPloss.log_train(train_epoch, train_loss.item(), infra_metrics=infra_metrics if train_epoch > 5 else None)
+    
+    # Save checkpoints at epochs 2000, 10000, and 80000
+    if train_epoch in [1, 2000, 10000, 80000]:
+        save_checkpoint(model, optimizer, train_epoch, NTPloss, "GPT")
     
     if train_epoch % config.validation_frequency == 0:
         model.eval()

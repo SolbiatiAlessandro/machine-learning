@@ -36,13 +36,25 @@ class DataLoader:
     def _load_dataset(self, filename):
         if self.tokenizer is None: 
             raise Exception("[DataloaderException] Need to load dataset after loading tokenizer")
-        filename = f"{self.DATASET_FOLDER}/{filename}"
-        with open(filename, 'r') as f:
-            text = f.read()
-        print(f"[DataLoader._load_dataset] {filename}: size = {len(text)}")
-        
-        encoded_dataset = self.tokenizer.encode(text, raw_tokens=False)
-        print(f"[DataLoader._load_dataset] {filename}: max vocabulary size={max(encoded_dataset)}, compression ratio={len(encoded_dataset) / len(text)}")
+        filepath = os.path.join(self.DATASET_FOLDER, filename)
+        cache_file = filepath + ".cache.pt"  # cache file path
+
+        if os.path.exists(cache_file):
+            print(f"[DataLoader._load_dataset] Loading cached encoding from {cache_file}")
+            encoded_dataset = torch.load(cache_file)
+            
+        else:
+            with open(filepath, 'r') as f:
+                text = f.read()
+            print(f"[DataLoader._load_dataset] {filepath}: size = {len(text)}")
+            encoded_dataset = self.tokenizer.encode(text, raw_tokens=False)
+            print(f"[DataLoader._load_dataset] {filepath}: max vocabulary size = {max(encoded_dataset)}, compression ratio = {len(encoded_dataset) / len(text)}")
+            # Save the computed encoding to cache
+            torch.save(encoded_dataset, cache_file)
+            print(f"[DataLoader._load_dataset] Saved cached encoding to {cache_file}")
+            
+        self.vocab_size = max(encoded_dataset) + 1
+        print(f"[DataLoader._load_dataset] {filepath}: vocab_size = {self.vocab_size}")
         
         return torch.tensor(encoded_dataset, device='cpu')
 

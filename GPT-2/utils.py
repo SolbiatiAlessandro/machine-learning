@@ -96,36 +96,46 @@ class LossLogs:
     
     def state_dict(self):
         # Return a shallow copy of all instance attributes.
-        return self.__dict__.copy()
+        # Exclude the wandb object from the state
+        state = self.__dict__.copy()
+        if 'wandb' in state:
+            state['wandb'] = None
+        return state
 
     def load_state_dict(self, state):
         # Update the instance attributes with those saved in the checkpoint.
         self.__dict__.update(state)
+        
+import os
+import torch
 
-def save_checkpoint(model, optimizer, train_epoch, MLMloss, NSPloss, model_name):
-    checkpoint_path = f"checkpoint_latest_{model_name}.pth"
+def save_checkpoint(model, optimizer, train_epoch, loss_logger, model_name):
+    # Ensure the checkpoints folder exists
+    checkpoint_dir = "./checkpoints"
+    os.makedirs(checkpoint_dir, exist_ok=True)
+    
+    # Create a filename that includes the epoch number
+    checkpoint_path = os.path.join(checkpoint_dir, f"checkpoint_epoch_{train_epoch}_{model_name}.pth")
+    
     checkpoint = {
         'train_epoch': train_epoch,
         'model_state_dict': model.state_dict(),
         'optimizer_state_dict': optimizer.state_dict(),
-        'MLMloss_state': MLMloss.state_dict(),
-        'NSPloss_state': NSPloss.state_dict(),
+        'loss_state': loss_logger.state_dict(),
         'model_name': model_name
     }
     torch.save(checkpoint, checkpoint_path)
     print(f"Checkpoint saved to {checkpoint_path}")
     return checkpoint_path
 
-def load_checkpoint(model, optimizer, checkpoint_path, MLMloss, NSPloss):
+def load_checkpoint(model, optimizer, checkpoint_path, loss_logger):
     checkpoint = torch.load(checkpoint_path)
     model.load_state_dict(checkpoint['model_state_dict'])
     if optimizer:
         optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
     train_epoch = checkpoint['train_epoch']
-    if MLMloss:
-        MLMloss.load_state_dict(checkpoint['MLMloss_state'])
-    if NSPloss:
-        NSPloss.load_state_dict(checkpoint['NSPloss_state'])
+    if loss_logger:
+        loss_logger.load_state_dict(checkpoint['loss_state'])
     model_name = checkpoint['model_name']
     print(f"Checkpoint loaded from {checkpoint_path}, resuming at epoch {train_epoch}")
     return train_epoch, model_name
