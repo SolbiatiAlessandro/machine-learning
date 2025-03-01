@@ -117,7 +117,7 @@ def save_checkpoint(model, optimizer, train_epoch, loss_logger, model_name):
     # Create a filename that includes the epoch number
     checkpoint_path = os.path.join(checkpoint_dir, f"checkpoint_epoch_{train_epoch}_{model_name}.pth")
     
-    checkpoint = {
+    checkpoint = { 
         'train_epoch': train_epoch,
         'model_state_dict': model.state_dict(),
         'optimizer_state_dict': optimizer.state_dict(),
@@ -130,7 +130,11 @@ def save_checkpoint(model, optimizer, train_epoch, loss_logger, model_name):
 
 def load_checkpoint(model, optimizer, checkpoint_path, loss_logger):
     checkpoint = torch.load(checkpoint_path)
-    model.load_state_dict(checkpoint['model_state_dict'])
+    
+    state_dict = checkpoint['model_state_dict']
+    new_state_dict = {k.replace('_orig_mod.', ''): v for k, v in state_dict.items()}
+    model.load_state_dict(new_state_dict)
+
     if optimizer:
         optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
     train_epoch = checkpoint['train_epoch']

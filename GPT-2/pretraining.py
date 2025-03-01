@@ -1,15 +1,24 @@
+import subprocess
+import sys
+
+subprocess.check_call([sys.executable, "-m", "pip", "install", "--upgrade", "datasets"])
+
+
 from GPT import GPT, GPTConfig
 from dataloader import DataLoader
+from evaluation import evaluate_downstream_cbt_with_probs
+from generate import sample_generations
 from utils import device, get_free_gpu_memory, LossLogs, save_checkpoint, load_checkpoint
 
 config = GPTConfig()
-config.batch_size = 28
+config.batch_size = 20
 config.block_size = 1024
 config.epochs = 1000000
-config.validation_frequency = 50
-config.validation_epochs = 2
+config.validation_frequency = 100
+config.validation_epochs = 5
 config.dataset = "wikitext"
 config.tokenizer_name = "wikitext2_18k"
+config.downstream_evals_iterations = 300
 
 import wandb
 import random
@@ -105,8 +114,29 @@ for train_epoch in range(config.epochs):
     }
     NTPloss.log_train(train_epoch, train_loss.item(), infra_metrics=infra_metrics if train_epoch > 5 else None)
     
-    if train_epoch in [1000, 5000, 40000]:
-        save_checkpoint(model, optimizer, train_epoch, NTPloss, "GPT_vocab18k")
+    if train_epoch in [0, 50, 1000, 5000, 10000, 20000, 40000, 80000]:
+        accuracy, _, skipped = evaluate_downstream_cbt_with_probs(
+            model=model,
+            tokenizer=data_loader.tokenizer,
+            device=device,
+            dataset_split="validation",
+            verbose=False,
+            max_context_length=config.block_size - 1,
+            max_examples=config.downstream_evals_iterations  
+        )
+        wandb.log({
+            'downstream/children_book_text_accuracy': accuracy,
+            'downstream/children_book_text_skipped': skipped,
+        })
+        
+        generated_evals = sample_generations(
+            model, 
+            data_loader.tokenizer, 
+            config, 
+            device=device,
+            wandb_obj=wandb,
+            iteration=train_epoch)
+        
     
     if train_epoch % config.validation_frequency == 0:
         model.eval()
