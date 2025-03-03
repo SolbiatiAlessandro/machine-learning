@@ -31,7 +31,12 @@ class DataLoader:
         
         self.train_data_ix = 0
         self.val_data_ix = 0
-        self.batch_step = self.config.batch_size * self.config.block_size 
+        self.batch_size = self.config.batch_size
+        
+    @property
+    def batch_step(self):
+        """Dynamic getter for batch_step based on current batch size"""
+        return self.batch_size  * self.config.block_size
         
     def _load_dataset(self, filename):
         if self.tokenizer is None: 
@@ -58,8 +63,10 @@ class DataLoader:
         
         return torch.tensor(encoded_dataset, device='cpu')
 
-    def next_batch(self, mode="train", device='cpu'):
+    def next_batch(self, mode="train", device='cpu', batch_size=None):
         """ mode=["train", "eval"] """
+        if batch_size:
+            self.batch_size = batch_size
         if mode == "train":
             x, y = self._next_batch_train()
         else:
@@ -72,8 +79,8 @@ class DataLoader:
         ix = self.train_data_ix 
         
         buf = data[ix:ix+self.batch_step + 1]     
-        x = buf[:-1].view(self.config.batch_size, self.config.block_size)
-        y = buf[1:].view(self.config.batch_size, self.config.block_size)
+        x = buf[:-1].view(self.batch_size, self.config.block_size)
+        y = buf[1:].view(self.batch_size, self.config.block_size)
         
         self.train_data_ix += self.batch_step 
         if self.train_data_ix + self.batch_step + 1 > len(self.train_data):
@@ -87,8 +94,8 @@ class DataLoader:
         ix = self.val_data_ix 
         
         buf = data[ix:ix+self.batch_step + 1]     
-        x = buf[:-1].view(self.config.batch_size, self.config.block_size)
-        y = buf[1:].view(self.config.batch_size, self.config.block_size)
+        x = buf[:-1].view(self.batch_size, self.config.block_size)
+        y = buf[1:].view(self.batch_size, self.config.block_size)
         
         self.val_data_ix += self.batch_step 
         if self.val_data_ix + self.batch_step + 1 > len(self.val_data):

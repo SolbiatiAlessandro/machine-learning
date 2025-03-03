@@ -3,6 +3,7 @@ import torch.nn as nn
 import torch
 import torch.nn.functional as F
 import math
+import inspect
 
 
 @dataclass
@@ -48,7 +49,14 @@ class MultiHeadedMaskedSelfAttention(nn.Module):
             config.n_head,
             config.n_embd // config.n_head
         ).transpose(1,2)
+        v = v.view(
+            B, 
+            T, 
+            config.n_head,
+            config.n_embd // config.n_head
+        ).transpose(1,2)
         
+        """
         attention = (q @ k.transpose(2,3)) * (1.0 / math.sqrt(k.size(-1)))
         
         # this could be slow cause we are creating mask every time
@@ -58,14 +66,11 @@ class MultiHeadedMaskedSelfAttention(nn.Module):
                 float('-inf')),
             dim=-1)
         
-        v = v.view(
-            B, 
-            T, 
-            config.n_head,
-            config.n_embd // config.n_head
-        ).transpose(1,2)
-        
         out = masked_attention @ v
+        """
+        out = F.scaled_dot_product_attention(q, k, v, is_causal=True)
+        
+        
         out = out.transpose(1,2).contiguous().view(B,T,config.n_embd)
         out = self.c_proj(out)
         return out
@@ -151,6 +156,22 @@ class GPT(nn.Module):
         x = self.lm_head(x)
         #x = x @ self.transformer.wte.weight.T
         return x
+    
+    def configure_optimizer(self, weight_decay, learning_rate, device):
+        param_dict = {pn: p for pn, p in self.named_parameters()}
+        param_dict = {pn: p for pn, p in param_dict.items() if p.requires_grad}
+        
+        decay_params = [p for n,p in param_dict.items() if p.dim() >= 2]
+        nodecay_params = [p for n,p in param_dict.items() if p.dim() < 2]
+        optim_groups = [
+            {'params': decay_params, 'weight_decay': weight_decay},
+            {'params': nodecay_params, 'weight_decay': 0.0}
+        ]
+        
+        fused_available = 'fused' in inspect.signature(torch.optim.AdamW).parameters
+        use_fused = fused_available and 'cuda' in device
+        optimizer = torch.optim.AdamW(optim_groups, lr=learning_rate, betas=(0.9, 0.95), eps=1e-8, fused=use_fused)
+        return optimizer
     
     @classmethod
     def from_pretrained(cls, model_type):
