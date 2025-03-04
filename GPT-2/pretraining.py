@@ -1,5 +1,32 @@
+import os
+import sys
+import torch
+from torch.distributed import init_process_group, destroy_process_group
+
+ddp = int(os.environ.get('RANK', -1)) != -1
+if ddp:
+    init_process_group(backend='nccl')
+    ddp_rank = int(os.environ['RANK'])
+    ddp_local_rank = int(os.environ['LOCAL_RANK'])
+    ddp_world_size = int(os.environ['WORLD_SIZE'])
+    device = f'cuda:{ddp_local_rank}'
+    torch.cuda.set_device(device)
+    print(f"torch.distributed: ddp_rank={ddp_rank}, ddp_local_rank={ddp_local_rank}, ddp_world_size={ddp_world_size}")
+    master_process = ddp_rank == 0
+else:
+    ddp_rank = 0
+    ddp_local_rank = 0
+    ddp_world_size = 1
+    master_process = True
+    
+torch.manual_seed(1337)
+if torch.cuda.is_available():
+    torch.cuda.manual_seed(1337)
+
+
 import subprocess
 import sys
+
 
 subprocess.check_call([sys.executable, "-m", "pip", "install", "--upgrade", "datasets"])
 
@@ -12,7 +39,7 @@ from utils import device, get_free_gpu_memory, LossLogs, save_checkpoint, load_c
 
 config = GPTConfig()
 config.mini_batch_size = 64
-config.total_batch_size = 524288
+config.total_batch_size = 64*64
 config.block_size = 1024
 config.epochs = 1000000
 config.validation_frequency = 10
@@ -21,6 +48,28 @@ config.dataset = "wikitext"
 config.tokenizer_name = "wikitext2_18k"
 config.downstream_evals_iterations = 300
 config.downstream_evals_frequency = 100
+
+"""
+100k tokens/s
+6h training
+6M per min
+360M per h
+2B tokens
+
+> All models were trained for a total of 300 billion tokens.
+To train all versions of GPT-3, we use Adam with β1 = 0.9, β2 = 0.95, and  = 10−8
+, we clip the global norm of the
+gradient at 1.0, and we use cosine decay for learning rate down to 10% of its value, 
+> over 260 billion tokens = 86%
+(after 260 billion tokens, training continues at 10% of the original learning rate). 
+There is a linear LR warmup 
+> over the first 375 million tokens = 1%
+We also gradually increase the batch size linearly from a small value (32k tokens) to the full value over
+the first 
+
+> 4-12 billion tokens of training, depending on the model size
+= 5%
+"""
 
 import wandb
 import random
@@ -83,10 +132,14 @@ NTPloss = LossLogs("NTP", wandb=wandb)
 
 config.epochs = 30000
 
+import math
+
 max_lr = 6e-4
 min_lr = max_lr * 0.1
-warmup_step = config.epochs * 0.2
-asymptotic_step = config.epochs * 0.5
+# using tokens instead of steps
+warmup_step = 2e7 # 20M tokens
+warmup_batch = 1e9 # 1B tokens
+asymptotic_step = 1e9 # 1B tokens
 
 def get_lr(step):
     # Linear warmup for the first 10% of steps
@@ -105,21 +158,26 @@ def get_lr(step):
 
     
 def get_batch_size(step, start_batch_size = 64):
-    if step < warmup_step:
-        return start_batch_size + int((config.total_batch_size - start_batch_size) * (step+1) / warmup_step)
+    if step < warmup_batch:
+        return start_batch_size + int((config.total_batch_size - start_batch_size) * (step+1) / warmup_batch)
     return config.total_batch_size
+
+
+#training loop --------------
+
 
 from time import time
 train_epoch = 0
+tokens = 1
 optimizer.zero_grad()
 while True:
     
     train_epoch += 1
     total_batch_iteration_time = 0
-    batch_size = get_batch_size(train_epoch)
+    batch_size = get_batch_size(tokens)
     epoch_train_loss = 0.0
     t0 = time()
-    mini_batch_steps = int(batch_size / config.mini_batch_size)
+    mini_batch_steps = int(batch_size / (config.mini_batch_size * ddp_world_size))
     for mini_batch_step in range(mini_batch_steps):
         
         
@@ -139,10 +197,11 @@ while True:
         
     t1 = time()
     dt = (t1 - t0) * 1000 
+    tokens += X.shape[0]*X.shape[1]*mini_batch_steps
     tps = 1000*X.shape[0]*X.shape[1]*mini_batch_steps/dt
         
     norm = torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
-    lr = get_lr(train_epoch*mini_batch_steps)
+    lr = get_lr(tokens)
     for param_group in optimizer.param_groups:
         param_group['lr'] = lr
 
@@ -152,6 +211,7 @@ while True:
     infra_metrics = {
         'infra/iteration_time(ms)': dt,
         'infra/tokens_per_second': tps,
+        'training/tokens': tokens,
         'training/norm': norm,
         'training/batch_size': batch_size,
         'training/learning_rate': lr,
