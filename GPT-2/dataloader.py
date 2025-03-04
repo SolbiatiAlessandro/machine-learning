@@ -10,7 +10,7 @@ if tokenizer_dir not in sys.path:
 from RegexTokenizer import FastTokenizer
 
 class DataLoader:
-    def __init__(self, config):
+    def __init__(self, config, process_rank=0, num_processes=1):
         """
         name = tinyshakespeare
         input text = tinyshakespeare.txt
@@ -18,6 +18,8 @@ class DataLoader:
         """
         
         self.config = config
+        self.process_rank = process_rank
+        self.num_processes = num_processes
         dataset_name = config.dataset
         self.DATASET_FOLDER = "./datasets"
        
@@ -29,9 +31,10 @@ class DataLoader:
         self.val_data = self._load_dataset(f"{dataset_name}_val.txt")
         print(f"[DataLoader.__init__] train_data.shape={self.train_data.shape}, val_data.shape={self.val_data.shape}")
         
-        self.train_data_ix = 0
-        self.val_data_ix = 0
+        
         self.batch_size = self.config.batch_size
+        self.train_data_ix = self.batch_size * self.process_rank
+        self.val_data_ix = self.batch_size * self.process_rank
         
     @property
     def batch_step(self):
@@ -82,9 +85,9 @@ class DataLoader:
         x = buf[:-1].view(self.batch_size, self.config.block_size)
         y = buf[1:].view(self.batch_size, self.config.block_size)
         
-        self.train_data_ix += self.batch_step 
-        if self.train_data_ix + self.batch_step + 1 > len(self.train_data):
-            self.train_data_ix = 0
+        self.train_data_ix += self.batch_step * self.num_processes
+        if self.train_data_ix + (self.batch_step * self.num_processes) + 1 > len(self.train_data):
+            self.train_data_ix = self.batch_size * self.process_rank
         
         return x, y
     
@@ -97,9 +100,9 @@ class DataLoader:
         x = buf[:-1].view(self.batch_size, self.config.block_size)
         y = buf[1:].view(self.batch_size, self.config.block_size)
         
-        self.val_data_ix += self.batch_step 
-        if self.val_data_ix + self.batch_step + 1 > len(self.val_data):
-            self.val_data_ix = 0
+        self.val_data_ix += self.batch_step * self.num_processes
+        if self.val_data_ix + (self.batch_step * self.num_processes) + 1 > len(self.val_data):
+            self.val_data_ix = self.batch_size * self.process_rank
         
         return x, y
     

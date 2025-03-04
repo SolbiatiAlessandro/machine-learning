@@ -2,7 +2,10 @@ import os
 import sys
 import torch
 from torch.distributed import init_process_group, destroy_process_group
+from torch.nn.parallel import DistributedDataParallel as DDP
+import torch.distributed as dist
 
+# torchrun --standalone --nproc_per_node=2 pretraining.py
 ddp = int(os.environ.get('RANK', -1)) != -1
 if ddp:
     init_process_group(backend='nccl')
@@ -27,8 +30,7 @@ if torch.cuda.is_available():
 import subprocess
 import sys
 
-
-subprocess.check_call([sys.executable, "-m", "pip", "install", "--upgrade", "datasets"])
+# subprocess.check_call([sys.executable, "-m", "pip", "install", "--upgrade", "datasets"])
 
 
 from GPT import GPT, GPTConfig
@@ -71,21 +73,26 @@ the first
 = 5%
 """
 
-import wandb
+
 import random
 import dataclasses
 
-# start a new wandb run to track this script
-wandb.init(
-    # set the wandb entity where your project will be logged (generally your team name)
-    entity="lessandro",
+if master_process:
+    import wandb
+    # start a new wandb run to track this script
+    wandb.login()
+    wandb.init(
+        # set the wandb entity where your project will be logged (generally your team name)
+        entity="lessandro",
 
-    # set the wandb project where this run will be logged
-    project="GPT2",
+        # set the wandb project where this run will be logged
+        project="GPT2",
 
-    # track hyperparameters and run metadata
-    config=dataclasses.asdict(config)
-)
+        # track hyperparameters and run metadata
+        config=dataclasses.asdict(config)
+    )
+else:
+    wandb = None
 
 import torch
 import torch.nn.functional as F
@@ -111,22 +118,25 @@ if torch.cuda.is_available():
 else:
     print("CUDA is not available, running on CPU.")
 
-data_loader = DataLoader(config)
+data_loader = DataLoader(
+    config, 
+    process_rank=ddp_rank, 
+    num_processes=ddp_world_size)
 #config.vocab_size = data_loader.vocab_size
 config.vocab_size = 17792
 
-model = GPT(config)
-model.to(device)
-
-model = torch.compile(model)
-total_params = sum(p.numel() for p in model.parameters())
+raw_model = GPT(config)
+raw_model.to(device)
+raw_model = torch.compile(raw_model)
+total_params = sum(p.numel() for p in raw_model.parameters())
+optimizer = raw_model.configure_optimizer(weight_decay=0.1, learning_rate=3e-4, device=device)
 print(f"Total parameters: {total_params:,}")
+if ddp:
+    model = DDP(raw_model, device_ids=[ddp_local_rank])
+else:
+    model = raw_model
 
 torch.set_float32_matmul_precision("high")
-
-optimizer = model.configure_optimizer(weight_decay=0.1, learning_rate=3e-4, device=device)
-# train_losses, val_losses = [], []
-
 
 NTPloss = LossLogs("NTP", wandb=wandb)
 
@@ -157,7 +167,7 @@ def get_lr(step):
     return min_lr
 
     
-def get_batch_size(step, start_batch_size = 64):
+def get_batch_size(step, start_batch_size = 64*4):
     if step < warmup_batch:
         return start_batch_size + int((config.total_batch_size - start_batch_size) * (step+1) / warmup_batch)
     return config.total_batch_size
@@ -175,30 +185,27 @@ while True:
     train_epoch += 1
     total_batch_iteration_time = 0
     batch_size = get_batch_size(tokens)
-    epoch_train_loss = 0.0
-    t0 = time()
+    epoch_train_loss = torch.tensor(0.0, device=device)
+    t0, new_tokens = time(), 0
     mini_batch_steps = int(batch_size / (config.mini_batch_size * ddp_world_size))
     for mini_batch_step in range(mini_batch_steps):
-        
-        
     
         bb = config.mini_batch_size * config.block_size
         X, y = data_loader.next_batch(device=device, batch_size=config.mini_batch_size)
-        t01 = time()
+        new_tokens += X.shape[0] * X.shape[1]
         with torch.autocast(device_type=device, dtype=torch.bfloat16):
             logits = model(X)
             train_loss = F.cross_entropy(logits.view(bb, -1), y.view(bb))
             
         train_loss = train_loss / mini_batch_steps
         epoch_train_loss += train_loss.detach()
+        
+        if ddp:
+            model.require_backward_grad_sync = (mini_batch_step == mini_batch_steps - 1)
         train_loss.backward()  
+    if ddp:
+        dist.all_reduce(epoch_train_loss, op=dist.ReduceOp.AVG)
         
-        torch.cuda.synchronize()
-        
-    t1 = time()
-    dt = (t1 - t0) * 1000 
-    tokens += X.shape[0]*X.shape[1]*mini_batch_steps
-    tps = 1000*X.shape[0]*X.shape[1]*mini_batch_steps/dt
         
     norm = torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
     lr = get_lr(tokens)
@@ -207,6 +214,14 @@ while True:
 
     optimizer.step()
     optimizer.zero_grad()
+    
+    # log infra metricsb 
+    torch.cuda.synchronize()    
+    t1 = time()
+    dt = (t1 - t0) * 1000 
+    new_tokens = new_tokens*ddp_world_size
+    tokens += new_tokens
+    tps = 1000*new_tokens/dt
 
     infra_metrics = {
         'infra/iteration_time(ms)': dt,
@@ -219,54 +234,61 @@ while True:
     }
     NTPloss.log_train(train_epoch, epoch_train_loss.item(), infra_metrics=infra_metrics)
 
-
-    loss_string = f"[{train_epoch}*{mini_batch_steps}/{config.epochs}] train_loss={epoch_train_loss.item():.3f}"
-    infra_string = ", ".join([f"{k}={v:.6f}" for k,v in infra_metrics.items()])
-    print(loss_string + infra_string)
-
-
-
-    if train_epoch >= config.downstream_evals_frequency and (train_epoch % config.downstream_evals_frequency == 0 or train_epoch % (config.downstream_evals_frequency + 1) == 0):
-        accuracy, _, skipped = evaluate_downstream_cbt_with_probs(
-            model=model,
-            tokenizer=data_loader.tokenizer,
-            device=device,
-            dataset_split="validation",
-            verbose=False,
-            max_context_length=config.block_size - 1,
-            max_examples=config.downstream_evals_iterations  
-        )
-        wandb.log({
-            'downstream/children_book_text_accuracy': accuracy,
-            'downstream/children_book_text_skipped': skipped,
-        })
-
-        generated_evals = sample_generations(
-            model, 
-            data_loader.tokenizer, 
-            config, 
-            device=device,
-            wandb_obj=wandb,
-            iteration=train_epoch)
+    if master_process:
+        loss_string = f"[{train_epoch}*{mini_batch_steps}/{config.epochs}][GPU {ddp_rank}/{ddp_world_size}] global stats: train_loss={epoch_train_loss.item():.3f}"
+        infra_string = ", ".join([f"{k}={v:.6f}" for k,v in infra_metrics.items()])
+        print(loss_string + infra_string)
 
 
-    if (train_epoch + 1) % config.validation_frequency == 0:
-        model.eval()
-        with torch.no_grad():
-            epoch_val_losses = []
-            for val_epoch in range(config.validation_epochs):
-                X, y = data_loader.next_batch(mode="eval", device=device, batch_size=config.mini_batch_size)
-                logits = model(X)
-                val_loss = F.cross_entropy(logits.view(bb, -1), y.view(bb))
-                NTPloss.log_val(train_epoch, val_epoch, val_loss.item())
 
-                del X, y, logits
-                gc.collect()
-                torch.cuda.empty_cache()
+        #if train_epoch >= config.downstream_evals_frequency and (train_epoch % config.downstream_evals_frequency == 0 or train_epoch % (config.downstream_evals_frequency + 1) == 0):
+            
+        if False:
+            accuracy, _, skipped = evaluate_downstream_cbt_with_probs(
+                model=model,
+                tokenizer=data_loader.tokenizer,
+                device=device,
+                dataset_split="validation",
+                verbose=False,
+                max_context_length=config.block_size - 1,
+                max_examples=config.downstream_evals_iterations  
+            )
+            wandb.log({
+                'downstream/children_book_text_accuracy': accuracy,
+                'downstream/children_book_text_skipped': skipped,
+            })
+
+            generated_evals = sample_generations(
+                model, 
+                data_loader.tokenizer, 
+                config, 
+                device=device,
+                wandb_obj=wandb,
+                iteration=train_epoch)
 
 
-                model.train()
-                loss_string = f"[{train_epoch}/{config.epochs}] train_loss={epoch_train_loss.item():.3f},val_loss={NTPloss.get_val_loss(train_epoch):.3f}, "
-                loss_string += f", norm={norm}"
-                infra_string = ", ".join([f"{k}={v:.3f}" for k,v in infra_metrics.items()])
-                print(loss_string + infra_string)
+        if (train_epoch + 1) % config.validation_frequency == 0:
+            model.eval()
+            with torch.no_grad():
+                epoch_val_losses = []
+                for val_epoch in range(config.validation_epochs):
+                    X, y = data_loader.next_batch(mode="eval", device=device, batch_size=config.mini_batch_size)
+                    logits = model(X)
+                    bb = config.mini_batch_size * config.block_size
+                    val_loss = F.cross_entropy(logits.view(bb, -1), y.view(bb))
+                    NTPloss.log_val(train_epoch, val_epoch, val_loss.item())
+
+                    del X, y, logits
+                    gc.collect()
+                    torch.cuda.empty_cache()
+
+
+                    model.train()
+                    loss_string = f"[{train_epoch}/{config.epochs}] train_loss={epoch_train_loss.item():.3f},val_loss={NTPloss.get_val_loss(train_epoch):.3f}, "
+                    loss_string += f", norm={norm}"
+                    infra_string = ", ".join([f"{k}={v:.3f}" for k,v in infra_metrics.items()])
+                    print(loss_string + infra_string)
+
+                    
+if ddp:
+    destroy_process_group()

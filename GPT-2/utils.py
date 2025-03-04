@@ -64,7 +64,8 @@ class LossLogs:
         self.train_x.append(ix)
         self.train_loss.append(loss)
         if infra_metrics:
-            self.wandb.log(infra_metrics)
+            if self.wandb:
+                self.wandb.log(infra_metrics)
             for k, v in infra_metrics.items():
                 self.infra[k].append(v)
         
