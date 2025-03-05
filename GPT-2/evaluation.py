@@ -43,6 +43,17 @@ def compute_option_probability(context, before_placeholder, option, after_placeh
         outputs = model(inputs)
         logits = outputs
     
+    # Ensure logits match the tokenizer's vocabulary size
+    vocab_size = tokenizer.n_vocab
+    if logits.shape[-1] > vocab_size:
+        # If model has larger vocab size than tokenizer, truncate the extra dimensions
+        logits = logits[..., :vocab_size]
+    elif logits.shape[-1] < vocab_size:
+        # If model has smaller vocab size than tokenizer (unlikely), pad with very negative values
+        padding = torch.full((logits.shape[0], logits.shape[1], vocab_size - logits.shape[-1]), 
+                              -1e10, device=logits.device)
+        logits = torch.cat([logits, padding], dim=-1)
+        
     # Shift logits and input IDs for computing probabilities (predicting next token)
     shift_logits = logits[..., :-1, :].contiguous()
     shift_ids = inputs[..., 1:].contiguous()

@@ -1,13 +1,7 @@
 import torch
 import sys
 import os
-
-# Assuming your notebook's working directory is set such that ../llm-tokenizer is reachable:
-tokenizer_dir = os.path.abspath(os.path.join(os.getcwd(), '../llm_tokenizer'))
-if tokenizer_dir not in sys.path:
-    sys.path.insert(0, tokenizer_dir)
-
-from RegexTokenizer import FastTokenizer
+import tiktoken
 
 class DataLoader:
     def __init__(self, config, process_rank=0, num_processes=1):
@@ -23,9 +17,10 @@ class DataLoader:
         dataset_name = config.dataset
         self.DATASET_FOLDER = "./datasets"
        
-        self.tokenizer = FastTokenizer("", name=config.tokenizer_name)
-        self.tokenizer.load_from_file()
-        print(f"[DataLoader.__init__] loaded tokenizer {self.tokenizer._filename()}")
+        self.tokenizer = tiktoken.get_encoding("gpt2")
+        self.vocab_size = self.tokenizer.n_vocab
+        
+        print(f"[DataLoader.__init__] loaded tokenizer=tiktoken.{self.tokenizer.name}, vocab_size={self.vocab_size}")
         
         self.train_data =  self._load_dataset(f"{dataset_name}_train.txt")
         self.val_data = self._load_dataset(f"{dataset_name}_val.txt")
@@ -45,7 +40,7 @@ class DataLoader:
         if self.tokenizer is None: 
             raise Exception("[DataloaderException] Need to load dataset after loading tokenizer")
         filepath = os.path.join(self.DATASET_FOLDER, filename)
-        cache_file = filepath + ".cache.pt"  # cache file path
+        cache_file = filepath + "_" + self.tokenizer.name + ".cache.pt"  # cache file path
 
         if os.path.exists(cache_file):
             print(f"[DataLoader._load_dataset] Loading cached encoding from {cache_file}")
@@ -61,9 +56,6 @@ class DataLoader:
             torch.save(encoded_dataset, cache_file)
             print(f"[DataLoader._load_dataset] Saved cached encoding to {cache_file}")
             
-        self.vocab_size = max(encoded_dataset) + 1
-        print(f"[DataLoader._load_dataset] {filepath}: vocab_size = {self.vocab_size}")
-        
         return torch.tensor(encoded_dataset, device='cpu')
 
     def next_batch(self, mode="train", device='cpu', batch_size=None):

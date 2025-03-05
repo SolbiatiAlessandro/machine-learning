@@ -24,10 +24,15 @@ def generate(model, tokenizer, config, prompt="Hello, I'm a language model", dev
             v, ixs = logits[0, -1, :].topk(20)
             ix = torch.multinomial(F.softmax(v, dim=0), 1)
             new_token = ixs[ix]
+            
+            new_token_value = new_token.view(-1).item()
+            if new_token_value >= tokenizer.n_vocab:
+                new_token_value = new_token_value % tokenizer.n_vocab
+                
             to_decode.append(new_token.view(-1).item())
             x = torch.cat([x.view(-1), new_token])
 
-        output = tokenizer.decode(to_decode, raw_tokens=False)
+        output = tokenizer.decode(to_decode)
         
     print(f"[generate] generated: {output}")
     return(output)

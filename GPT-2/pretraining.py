@@ -40,14 +40,14 @@ from generate import sample_generations
 from utils import device, get_free_gpu_memory, LossLogs, save_checkpoint, load_checkpoint
 
 config = GPTConfig()
-config.mini_batch_size = 64
+config.mini_batch_size = 32
 config.total_batch_size = 64*64
 config.block_size = 1024
 config.epochs = 1000000
 config.validation_frequency = 10
 config.validation_epochs = 5
 config.dataset = "wikitext"
-config.tokenizer_name = "wikitext2_18k"
+config.tokenizer_name = "gpt2"
 config.downstream_evals_iterations = 300
 config.downstream_evals_frequency = 100
 
@@ -122,8 +122,8 @@ data_loader = DataLoader(
     config, 
     process_rank=ddp_rank, 
     num_processes=ddp_world_size)
-#config.vocab_size = data_loader.vocab_size
-config.vocab_size = 17792
+config.vocab_size = 51200
+#config.vocab_size = 17792
 
 raw_model = GPT(config)
 raw_model.to(device)
@@ -177,12 +177,14 @@ def get_batch_size(step, start_batch_size = 64*4):
 
 
 from time import time
-train_epoch = 0
+train_epoch = -1
 tokens = 1
 optimizer.zero_grad()
 while True:
     
     train_epoch += 1
+
+    
     total_batch_iteration_time = 0
     batch_size = get_batch_size(tokens)
     epoch_train_loss = torch.tensor(0.0, device=device)
@@ -241,30 +243,35 @@ while True:
 
 
 
-        #if train_epoch >= config.downstream_evals_frequency and (train_epoch % config.downstream_evals_frequency == 0 or train_epoch % (config.downstream_evals_frequency + 1) == 0):
+        #if train_epoch >= config.downstream_evals_frequency \
+        if True\
+        and (train_epoch % config.downstream_evals_frequency == 0 or train_epoch % (config.downstream_evals_frequency + 1) == 0):
             
-        if False:
-            accuracy, _, skipped = evaluate_downstream_cbt_with_probs(
-                model=model,
-                tokenizer=data_loader.tokenizer,
-                device=device,
-                dataset_split="validation",
-                verbose=False,
-                max_context_length=config.block_size - 1,
-                max_examples=config.downstream_evals_iterations  
-            )
-            wandb.log({
-                'downstream/children_book_text_accuracy': accuracy,
-                'downstream/children_book_text_skipped': skipped,
-            })
+            try: 
+                accuracy, _, skipped = evaluate_downstream_cbt_with_probs(
+                    model=model,
+                    tokenizer=data_loader.tokenizer,
+                    device=device,
+                    dataset_split="validation",
+                    verbose=False,
+                    max_context_length=config.block_size - 1,
+                    max_examples=config.downstream_evals_iterations  
+                )
+                wandb.log({
+                    'downstream/children_book_text_accuracy': accuracy,
+                    'downstream/children_book_text_skipped': skipped,
+                })
 
-            generated_evals = sample_generations(
-                model, 
-                data_loader.tokenizer, 
-                config, 
-                device=device,
-                wandb_obj=wandb,
-                iteration=train_epoch)
+                generated_evals = sample_generations(
+                    model, 
+                    data_loader.tokenizer, 
+                    config, 
+                    device=device,
+                    wandb_obj=wandb,
+                    iteration=train_epoch)
+            except Exception as e:
+                print("ERROR: evaluation failed")
+                print(e)
 
 
         if (train_epoch + 1) % config.validation_frequency == 0:
