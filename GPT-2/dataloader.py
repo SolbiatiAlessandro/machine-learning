@@ -69,7 +69,7 @@ class DataLoader:
         self.config = config
         self.process_rank = process_rank
         self.num_processes = num_processes
-        self.batch_size = self.config.mini_batch_size
+        self.batch_size = self.config.mini_batch_size 
        
         self.tokenizer = tiktoken.get_encoding("gpt2")
         self.vocab_size = self.tokenizer.n_vocab
@@ -84,24 +84,23 @@ class DataLoader:
         # advance loader to correct GPU by discarding tokens
         self.train_shard_loader.get_next_tokens(self.batch_step * self.process_rank)
         
-        self.val_shard_loader = ShardLoader(shard_filenames[-1:])
-        
-        
-        
-      
-        
+        if process_rank == 0:
+            self.val_shard_loader = ShardLoader(shard_filenames[-1:])
+            
     @property
     def batch_step(self):
         """Dynamic getter for batch_step based on current batch size"""
         return self.batch_size  * self.config.block_size
 
-    def next_batch(self, mode="train", device='cpu', batch_size=None, debug=True):
+    def next_batch(self, mode="train", device='cpu', debug=True, batch_size=None):
         """ mode=["train", "eval"] """
         if batch_size:
             self.batch_size = batch_size
         if mode == "train":
             shard_loader = self.train_shard_loader
         else:
+            if self.process_rank != 0:
+                raise Exception("validation batch called not from master process")
             shard_loader = self.val_shard_loader
         
         if debug:
@@ -113,13 +112,19 @@ class DataLoader:
         buf = torch.tensor(shard_loader.get_next_tokens(self.batch_step + 1))
         x = buf[:-1].view(self.batch_size, self.config.block_size)
         y = buf[1:].view(self.batch_size, self.config.block_size)
+        if debug:
+            print(f"[DataLoader.next_batch]"
+                  f" process_rank={self.process_rank}"
+                  f" shard_loader.data_ix={shard_loader.data_ix}"
+                  f" shard_loader.shard_ix={shard_loader.shard_ix}")
         
         # we discard these tokens
-        shard_loader.get_next_tokens(self.batch_step * self.num_processes)
+        token_to_advance = (self.batch_step * self.num_processes) - len(buf)
+        shard_loader.get_next_tokens(max(token_to_advance, 0))
         
         if debug:
             t1 = time()
-            print(f"[DataLoader.next_batch] batch_size={batch_size} completed in {t1 - t0}s")
+            print(f"[DataLoader.next_batch] batch_step={self.batch_step} completed in {t1 - t0}s")
     
         return x.to(device), y.to(device)
     
@@ -176,22 +181,61 @@ def test_data_loader():
     config.downstream_evals_frequency = 100
 
     dataloader = DataLoader(config)
-    print("[test_data_loader] TEST PASSED (loading)")
+    print("[test_data_loader] >>> TEST PASSED (loading)")
     
     batch_size = 1000
     x, y  = dataloader.next_batch(batch_size=batch_size)
     x.shape == torch.Size([batch_size, config.block_size])
     y.shape == torch.Size([batch_size, config.block_size])
-    print("[test_data_loader] TEST PASSED (small batch)")
+    print("[test_data_loader] >>> TEST PASSED (small batch)")
+    
+    batch_size = 1000
+    x, y  = dataloader.next_batch(mode="eval", batch_size=batch_size)
+    x.shape == torch.Size([batch_size, config.block_size])
+    y.shape == torch.Size([batch_size, config.block_size])
+    print("[test_data_loader] >>> TEST PASSED (small batch eval)")
     
     batch_size = 300000
     x, y  = dataloader.next_batch(batch_size=batch_size)
     x.shape == torch.Size([batch_size, config.block_size])
     y.shape == torch.Size([batch_size, config.block_size])
-    print("[test_data_loader] TEST PASSED (cross shard)")
+    print("[test_data_loader] >>> TEST PASSED (cross shard)")
+
+def test_data_loader_multiprocess():
+    config = TestConfig
+    config.mini_batch_size = 32
+    config.total_batch_size = 64*64
+    config.block_size = 1024
+    config.epochs = 1000000
+    config.validation_frequency = 10
+    config.validation_epochs = 5
+    config.tokenizer_name = "gpt2"
+    config.dataset_directory = "./tokenized_shards"
+    config.downstream_evals_iterations = 300
+    config.downstream_evals_frequency = 100
     
+    dataloader1 = DataLoader(config, process_rank=0, num_processes=3)
+    dx1 = dataloader1.train_shard_loader.data_ix
+    dataloader2 = DataLoader(config, process_rank=1, num_processes=3)
+    dx2 = dataloader2.train_shard_loader.data_ix
+    dataloader3 = DataLoader(config, process_rank=3, num_processes=3)
+    dx3 = dataloader3.train_shard_loader.data_ix
+    assert dx1 < dx2 < dx3
+    print("[test_data_loader] >>> TEST PASSED (loading 3 GPUs)")
+    dataloader1.next_batch()
+    dataloader2.next_batch()
+    dataloader3.next_batch()
+    dxx1 = dataloader1.train_shard_loader.data_ix
+    dxx2 = dataloader2.train_shard_loader.data_ix
+    dxx3 = dataloader3.train_shard_loader.data_ix
+    assert dx1 < dx2 < dx3 < dxx1 < dxx2 < dxx3
+    print(dx1, dx2, dx3, dxx1, dxx2, dxx3)
+    print("[test_data_loader] >>> TEST PASSED (next batch 3 GPUs)")
     
     
 if __name__ == "__main__":
-    test_shard_loader()
-    test_data_loader()
+    # passing at 7dedff24d5987b2cedb6a45f8f6dff3533467784
+    
+    # test_shard_loader()
+    # test_data_loader()
+    # test_data_loader_multiprocess()
