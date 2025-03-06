@@ -234,8 +234,7 @@ def test_data_loader_multiprocess():
     
     
 if __name__ == "__main__":
-    # passing at 7dedff24d5987b2cedb6a45f8f6dff3533467784
-    
-    # test_shard_loader()
-    # test_data_loader()
-    # test_data_loader_multiprocess()
+    # all passing at 5eb039556e5df9200446f2658dcb6ac2b864a08d
+    test_shard_loader()
+    test_data_loader()
+    test_data_loader_multiprocess()

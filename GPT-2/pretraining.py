@@ -46,10 +46,10 @@ config.block_size = 1024
 config.epochs = 1000000
 config.validation_frequency = 10
 config.validation_epochs = 5
-config.dataset = "wikitext"
+config.dataset_directory = "tokenized_shards" # this is fineweb EDU 10BT
 config.tokenizer_name = "gpt2"
-config.downstream_evals_iterations = 300
-config.downstream_evals_frequency = 100
+config.downstream_evals_iterations = 500
+config.downstream_evals_frequency = 50
 
 """
 100k tokens/s
@@ -193,7 +193,7 @@ while True:
     for mini_batch_step in range(mini_batch_steps):
     
         bb = config.mini_batch_size * config.block_size
-        X, y = data_loader.next_batch(device=device, batch_size=config.mini_batch_size)
+        X, y = data_loader.next_batch(device=device, batch_size=config.mini_batch_size, debug=False)
         new_tokens += X.shape[0] * X.shape[1]
         with torch.autocast(device_type=device, dtype=torch.bfloat16):
             logits = model(X)
@@ -243,8 +243,7 @@ while True:
 
 
 
-        #if train_epoch >= config.downstream_evals_frequency \
-        if True\
+        if train_epoch >= config.downstream_evals_frequency \
         and (train_epoch % config.downstream_evals_frequency == 0 or train_epoch % (config.downstream_evals_frequency + 1) == 0):
             
             try: 
@@ -279,7 +278,7 @@ while True:
             with torch.no_grad():
                 epoch_val_losses = []
                 for val_epoch in range(config.validation_epochs):
-                    X, y = data_loader.next_batch(mode="eval", device=device, batch_size=config.mini_batch_size)
+                    X, y = data_loader.next_batch(mode="eval", device=device, batch_size=config.mini_batch_size, debug=False)
                     logits = model(X)
                     bb = config.mini_batch_size * config.block_size
                     val_loss = F.cross_entropy(logits.view(bb, -1), y.view(bb))
