@@ -1,11 +1,17 @@
-# ML-engineer
+# machine-learning
 
 
 | Folder                                      | Project                                      | Status       |
 |---------------------------------------------|----------------------------------------------|-------------|
-| /GPT-2                                      | **GPT-2**, replicating GPT2 from scratch following [karpathy/nanoGPT](https://github.com/karpathy/nanoGPT) but with my own tokenizer | 🟠 **In Progress** | 
+| /DeepSeek                                      | Deepseek R1 https://www.youtube.com/watch?v=XMnxKGVnEUc&t=20s tiny R1 https://github.com/Jiayi-Pan/TinyZero  |  **Not Started** |  
+| /Vision                                       | **R1 https://www.youtube.com/watch?v=XMnxKGVnEUc&t=20s tiny R1 https://github.com/Jiayi-Pan/TinyZero**  |  **Not Started** |  
+| /Llama2                                      | Llama2 from scratch https://www.youtube.com/watch?v=oM4VmoabDAI&pp=0gcJCUUJAYcqIYzv |  **Not Started** | 
+| /stable-diffusion                                      | Coding stable diffusion from scratch https://www.youtube.com/watch?v=ZBKpAp_6TGI  |  **Not Started** | 
+| /flash-attention                                      | triton Flash Attention kernel https://youtu.be/zy8ChVd_oTM?si=5106nYOB4sj_X5RQ  |  **Not Started** | 
+| /SFT                                      | Supervised Fine Tunining - InstructGPT https://arxiv.org/abs/2203.02155  |  **Not Started** | 
+| /GPT-2                                      | **GPT-2**, replicating GPT2 from scratch following [karpathy/nanoGPT](https://github.com/karpathy/nanoGPT) but with my own tokenizer | ✅ **Completed** | 
 | /BERT                                  | **BERT**, replicating BERT paper (without additional guidance) using my own tokenizer | ✅ **Completed** | 
-| /llm-tokenizer                                      | **Tokenizers**, LLMs tokenizers following [karpathy/minbpe](https://github.com/karpathy/minbpe) | 🟠 **In Progress** | 
+| /llm-tokenizer                                      | **Tokenizers**, LLMs tokenizers following [karpathy/minbpe](https://github.com/karpathy/minbpe) | ✅ **Completed** | 
 | /mingpt                                     | **MiniGPT**, implementing transformers from 'Attention is All You Need' following [karpathy/minGPT](https://github.com/karpathy/minGPT) | ✅ **Completed** |
 | /makemore                                   | **Makemore**, simple language models following  [karpathy/makemore](https://github.com/karpathy/makemore) |  ✅ **Completed** |
 | /micrograd                                  | **Micrograd**, implementation of backpropagation following [karpathy/micrograd](https://github.com/karpathy/micrograd) |  ✅ **Completed** |
@@ -16,16 +22,18 @@
 
 -----------
 
-## ML-engineer/GPT-2
+## machine-learning/GPT-2
 
-Replicating GPT2 from scratch following [karpathy/nanoGPT](https://github.com/karpathy/nanoGPT) but with my own tokenizer. This is an example of improving token/s throughput for given model size by optimizing pytorch operations. Read more on my [GPT2 training notes](https://docs.google.com/document/d/12R4rATOytr2OkNysWoisq6W2CX2fWkpWQcm3G8LRyE4/edit?tab=t.0)
+Replicated GPT2 from scratch following [karpathy/nanoGPT](https://github.com/karpathy/nanoGPT) but with my own tokenizer, achieving same loss and eval performance to hugging face GPT2 model. This is an example of improving token/s throughput for given model size by optimizing pytorch operations. Read more on my [GPT2 training notes](https://docs.google.com/document/d/12R4rATOytr2OkNysWoisq6W2CX2fWkpWQcm3G8LRyE4/edit?tab=t.0)
+
+![](https://raw.githubusercontent.com/SolbiatiAlessandro/ML-system-design/refs/heads/main/imgs/GPT2-generation.png)
 
 ![](https://raw.githubusercontent.com/SolbiatiAlessandro/ML-system-design/refs/heads/main/imgs/gpt2-throughtput1.png)
 
 
 
 
-## ML-engineer/BERT
+## machine-learning/BERT
 
 Implemention of BERT paper without additional guidance using my own tokenizer. This is an example of pretraining on Next Sentence Prediction (NSP) and Masked Language Modelling (MLM) tasks.
 
@@ -41,7 +49,7 @@ Implementation of "Attention is All You Need" trasfomer architecture with minima
 ![](https://raw.githubusercontent.com/SolbiatiAlessandro/ML-system-design/refs/heads/main/imgs/minigpt-shakespeare1.png)
 
 
-## ML-engineer/Makemore
+## machine-learning/Makemore
 
 Replicated the makemore repo from Karpathy from his Zero to Hero NN course. Implementation of name-generation language models. Bi-grams, MLP, RNNs and other models in plain pytorch. This is the performance I was able to reproduce independently on the several architectures covered in the course.
 
@@ -52,7 +60,7 @@ Here are some interesting histogram from hyperparameter search on some simple la
 ![](https://raw.githubusercontent.com/SolbiatiAlessandro/ML-system-design/refs/heads/main/imgs/makemore-hist1.png)
 ![](https://raw.githubusercontent.com/SolbiatiAlessandro/ML-system-design/refs/heads/main/imgs/makemore-hist2.png)
 
-## ML-engineer/Micrograd
+## machine-learning/Micrograd
 
 Python-only implemention of Neural Networks. Playing with my own implementation of [micrograd](https://github.com/karpathy/micrograd) from Karpathy. Some interesting results
 
@@ -65,14 +73,14 @@ Python-only implemention of Neural Networks. Playing with my own implementation 
 ![](https://github.com/SolbiatiAlessandro/ML-system-design/blob/main/imgs/micrograd-2.png)
 
 
-## ML-engineer/Zero Shot LLM Retrieval
+## machine-learning/Zero Shot LLM Retrieval
 
 Using VMWare docs corpus (30M documents) from Kaggle to implement a e2e retrieval system using LLM encoders and generative models. Picture below is the tensorboard of the 12 stacked transformer blocks from https://huggingface.co/intfloat/e5-small-v2 used for text embedding
 
 ![](https://raw.githubusercontent.com/SolbiatiAlessandro/ML-system-design/refs/heads/main/imgs/zero-shot-retrieval.png)
 
 
-## ML-engineer/SparseNN Recommender System 
+## machine-learning/SparseNN Recommender System 
 
 Using Fashion Recommender System dataset to build a muli-stage ranking recommender system for 10M users and 100k fashion articles [https://www.kaggle.com/competitions/h-and-m-personalized-fashion-recommendations](https://www.kaggle.com/competitions/h-and-m-personalized-fashion-recommendations)
 
